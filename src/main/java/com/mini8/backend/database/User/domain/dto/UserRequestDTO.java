@@ -1,15 +1,25 @@
 package com.mini8.backend.database.User.domain.dto;
 
-import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.validation.constraints.Min;
+import java.time.LocalDate;
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Builder
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+
 
 public class UserRequestDTO {
    
-    private Integer user_id;
+   
   
     private String google_sub;
 

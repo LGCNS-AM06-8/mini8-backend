@@ -9,13 +9,19 @@ import jakarta.persistence.Id;
 
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
-
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Table(name = "app_user")
-public class AppUserEntity {
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

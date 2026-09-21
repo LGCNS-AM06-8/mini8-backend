@@ -13,10 +13,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Table(name = "USER_SKILL")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserSkillEntity {
 
     @Id
@@ -25,7 +33,7 @@ public class UserSkillEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private AppUserEntity user;
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tech_tag_id")

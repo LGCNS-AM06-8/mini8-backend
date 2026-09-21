@@ -35,5 +35,5 @@ public class UserJobFieldEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
-    private AppUserEntity user;
+    private UserEntity user;
 }
