@@ -1,6 +1,9 @@
 package com.mini8.backend.features.post.ctrl;
 
 import com.mini8.backend.features.post.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,13 @@ public class PostController {
 
   private final PostService postService;
 
+  // getPost: 게시글 원본 조회
+  @Operation(summary = "게시글 원본 조회", description = "게시글의 원본과 목차를 조회함")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "게시글 조회 성공"),
+    @ApiResponse(responseCode = "401", description = "게시글 조회 실패(토큰 유효성 확인)"),
+    @ApiResponse(responseCode = "404", description = "게시글 조회 실패(유효하지 않은 postId)")
+  })
   @GetMapping("/{id}")
   public ResponseEntity<?> getPost(@PathVariable("id") int id) {
     return null;
