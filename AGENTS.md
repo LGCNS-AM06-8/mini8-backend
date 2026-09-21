@@ -6,7 +6,7 @@ AI 도구(Claude Code · Cursor · ChatGPT 등)가 이 저장소에서 일할 �
 
 - 주제: 경력 년수 · 보유 기술 · 관심 기술 · 희망 직무를 입력하면 기술블로그를 가진 기업을 추천하고, 글을 고르면 그 글을 내 수준에 맞게 어떻게 읽을지 AI가 안내하는 서비스
 - 기간 2026-09-21 ~ 09-30. 작업일은 나흘(9/21 · 9/22 · 9/28 · 9/29). 9/23~27은 휴강과 주말, 9/30은 발표
-- 스택: React · Spring Boot 3.4.5 · Java 17 · **MariaDB** · Flyway · JWT
+- 스택: React · Spring Boot 3.4.5 · Java 17 · **MariaDB** · JPA(ddl-auto) · JWT
 - 6명이 파트(DB·환경 / 서버·프롬프트 / 수집 / 화면)로 나눠 구현하고 `develop`에서 합칩니다
 
 **2026-09-18에 채용 공고 기능을 전부 뺐습니다.** 공고 데이터를 허용된 경로로 받을 수 없어서입니다.
@@ -17,7 +17,7 @@ AI 도구(Claude Code · Cursor · ChatGPT 등)가 이 저장소에서 일할 �
 | 무엇 | 어디 |
 |---|---|
 | API 규격 | **노션 API 명세서 DB** (16행). 저장소 안에 사본을 두지 않습니다 |
-| 테이블·ERD | **노션 ERD 페이지** + `backend/src/main/resources/db/mariadb/V*.sql` |
+| 테이블 | **`database/entity/` 의 JPA 엔티티** (DB 담당 한 사람만 고친다). 노션 ERD 페이지는 제출용 사본 |
 | 화면 | **Figma `Design` 페이지** |
 | 브랜치·커밋·PR | `CONTRIBUTING.md` |
 
@@ -27,7 +27,23 @@ AI 도구(Claude Code · Cursor · ChatGPT 등)가 이 저장소에서 일할 �
 
 - `.env`: 값이 든 파일. 읽지도 쓰지도 않습니다
 - 다른 파트가 맡은 폴더
-- `db/mariadb/V*.sql` 중 **이미 적용된 파일**. 스키마를 바꾸려면 `V{다음번호}__설명.sql`을 새로 만듭니다. 적용된 파일을 고치면 다른 사람 서버가 체크섬 불일치로 안 뜹니다
+- `database/entity/` 의 엔티티. DB 담당(노건우) 외에는 고치지 않습니다. 칸이 필요하면 `backend-issue` 포럼에 올립니다
+- `features/*/domain/entity/` 에 엔티티를 새로 만들지 않습니다. 엔티티는 한 자리에 한 벌만 있습니다
+
+## 누가 어디를 고치나 (소유 지도)
+
+| 경로 | 주인 | 내용 |
+|---|---|---|
+| `commons/config` · `filter` · `token` · `exception` · `handler` | 박준우 | Security · CORS · Swagger · JWT · 오류 응답 |
+| `database/entity/` | 노건우 | JPA 엔티티 10개. 표는 여기서만 |
+| `features/user` · `tech` · `company` | 박준우 | 로그인 · 프로필 · 기술 칩 · 기업 목록 · 기업 상세 |
+| `features/post` · `guide` | 류지범 | 글 원문 · 글 목록(추천) · AI 가이드 |
+| `features/bookmark` | 노건우 | 북마크 3 |
+| `features/collect` · `features/admin` | 신해원 | 수집 · 관리자 API |
+| `src/main/resources/prompts/` | 류지범 | 가이드 프롬프트 |
+| `application*.yml` · `build.gradle` · 이 문서들 | 신해원 | 설정 · 의존성. 바꿔야 하면 `backend-issue` |
+
+각 `features/<도메인>/` 은 `ctrl · service · repository · domain/dto` 만 가집니다. Repository 의 제네릭은 `database/entity` 의 클래스를 씁니다.
 
 ## 오류 응답
 
