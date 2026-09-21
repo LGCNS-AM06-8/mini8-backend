@@ -1,10 +1,17 @@
 package com.mini8.backend.database.User.domain.dto;
 
-import com.mini8.backend.database.Tech.domain.entity.TechTagEntity;
-import com.mini8.backend.database.User.domain.entity.UserEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-// 마이페이지에서 지정하면 Db로 올라가는 파일 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserSkillRequestDTO {
-    private UserEntity user;
-    private TechTagEntity techTag;
+
+    private Long  userId;
+
+    private Long  techTagId;
+
+    private String skillType;
 }

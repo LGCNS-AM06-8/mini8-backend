@@ -25,7 +25,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer user_id;
+    private Long user_id;
 
     @Column(nullable = false, unique = true,length = 100)
     private String google_sub;
