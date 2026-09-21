@@ -1,0 +1,7 @@
+spring:
+  profiles:
+    default: dev
+
+  # 같은 폴더의 .env 를 읽는다 (수업 방식). 없어도 기동은 되게 optional
+  config:
+    import: optional:file:./.env[.properties]

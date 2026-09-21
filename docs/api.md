@@ -1,0 +1,16 @@
+# API 규격
+
+**이 파일은 규격이 아닙니다.** 규격의 원천은 **노션 API 명세서 DB**(16행)입니다.
+
+저장소 안에 사본을 두면 노션과 어긋나고, 어느 쪽이 맞는지 아무도 모르게 됩니다.
+그래서 여기에는 링크만 둡니다.
+
+| 무엇 | 어디 |
+|---|---|
+| API 16행 (요청 · 응답 · 오류 · 예시) | 노션 산출물 체크리스트 6번 「API 명세서」 |
+| 오류 응답 형식 | `{code, message, field}`. 스택 트레이스 금지 |
+| AI 가이드 응답 규격 | `summary` · `readingOrder` · `sections[{seq, level, reason}]` · `notes[3]`. `level`은 `core` · `normal` · `skip` |
+
+규격을 바꿔야 하면 `backend-issue`·`frontend-issue` 포럼에 올립니다. 노션을 먼저 고치고 코드를 맞춥니다.
+
+실제로 도는 규격은 서버를 띄우고 `http://localhost:8000/swagger-ui/index.html`에서 확인합니다.
