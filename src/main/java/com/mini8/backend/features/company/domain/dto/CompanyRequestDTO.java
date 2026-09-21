@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Builder
-@Getter 
-@ToString 
-@NoArgsConstructor 
-@AllArgsConstructor 
-public class CompanyRequestDTO {
-    
-}
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class CompanyRequestDTO {}

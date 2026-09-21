@@ -1,4 +1,5 @@
 package com.mini8.backend.features.company.domain.dto;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -6,10 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Builder
-@Getter 
-@ToString 
-@NoArgsConstructor 
-@AllArgsConstructor 
-public class CompanyResponseDTO {
-    
-}
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class CompanyResponseDTO {}
