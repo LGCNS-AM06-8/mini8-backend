@@ -75,7 +75,14 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    // 실제 블로그에 요청하는 테스트는 평소에 건너뛴다. 인터넷 상태에 따라 남의 빌드가 깨지기 때문.
+    //   ./gradlew test            받아 둔 파일로만 (빠름)
+    //   ./gradlew test -Pnetwork  여덟 곳에 실제 요청 (사이트 개편 확인용)
+    useJUnitPlatform {
+        if (!project.hasProperty('network')) {
+            excludeTags 'network'
+        }
+    }
     testLogging {
         showStandardStreams = true   // 테스트가 찍는 값을 터미널에 그대로 보여준다
     }

@@ -8,9 +8,11 @@ import com.mini8.backend.features.collect.domain.dto.CollectedPost;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /** 여덟 곳을 한 흐름으로 돌린다. 실제 요청을 보내므로 몇 분 걸린다. */
+@Tag("network")
 class CollectServiceTest {
 
   private static final List<BlogSource> SOURCES =
@@ -72,7 +74,8 @@ class CollectServiceTest {
   private static CollectService service() {
     XmlFetcher xml = new XmlFetcher();
     HeadingFinder headings = new HeadingFinder();
-    ArticlePageReader pageReader = new ArticlePageReader(new ArticleExtractor(), headings);
+    ArticlePageReader pageReader =
+        new ArticlePageReader(new PageFetcher(), new ArticleExtractor(), headings);
     return new CollectService(
         List.of(
             new RssReader(xml, headings),

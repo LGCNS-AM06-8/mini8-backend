@@ -6,7 +6,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
@@ -21,13 +20,14 @@ import org.springframework.stereotype.Component;
 public class ArticlePageReader {
 
   private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-  private static final String AGENT = "mini8-collector/0.1";
-  private static final int TIMEOUT_MS = 60_000;
 
+  private final PageFetcher fetcher;
   private final ArticleExtractor extractor;
   private final HeadingFinder headingFinder;
 
-  public ArticlePageReader(ArticleExtractor extractor, HeadingFinder headingFinder) {
+  public ArticlePageReader(
+      PageFetcher fetcher, ArticleExtractor extractor, HeadingFinder headingFinder) {
+    this.fetcher = fetcher;
     this.extractor = extractor;
     this.headingFinder = headingFinder;
   }
@@ -36,7 +36,7 @@ public class ArticlePageReader {
   public Optional<CollectedPost> read(String company, String url) {
     Document page;
     try {
-      page = Jsoup.connect(url).userAgent(AGENT).timeout(TIMEOUT_MS).maxBodySize(0).get();
+      page = fetcher.fetch(url);
     } catch (Exception e) {
       return Optional.empty();
     }

@@ -8,9 +8,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /** 컬리 · LY 글 페이지에서 본문이 제대로 잡히는지 본다. 주소는 목록에서 받아 쓴다(지어내면 없는 글을 부른다). */
+@Tag("network")
 class ArticleExtractorTest {
 
   private static final String AGENT = "mini8-collector/0.1";

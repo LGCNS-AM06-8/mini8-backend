@@ -8,9 +8,11 @@ import com.mini8.backend.features.collect.domain.dto.CollectedPost;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /** 실제 피드를 받아 값이 채워지는지 확인한다. 네트워크를 타므로 저장소에 올리기 전에 어떻게 할지 정한다. */
+@Tag("network")
 class RssReaderTest {
 
   private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("yyyy-MM-dd");
