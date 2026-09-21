@@ -1,6 +1,8 @@
 package com.mini8.backend.features.tech.ctrl;
 
 import com.mini8.backend.features.tech.service.TechService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +16,10 @@ public class TechController {
 
   private final TechService techService;
 
-  // getTechList: 기술 칩 목록 불러오기
-  @GetMapping("/")
+  // getTechList: 기술 칩 목록 조회
+  @Operation(summary = "기술 칩 목록 조회", description = "기술 칩 목록을 조회함")
+  @ApiResponse(responseCode = "200", description = "기술 칩 목록 불러오기 성공")
+  @GetMapping
   public ResponseEntity<?> getTechList() {
     return null;
   }
