@@ -1,4 +1,4 @@
-# gradlew test 용. MariaDB 없이 H2 (MariaDB 호환 모드) 에 같은 Flyway SQL 을 흘려 스키마까지 검증한다
+# gradlew test 용. MariaDB 없이 H2 (MariaDB 호환 모드) 에 엔티티로 표를 만들어 매핑까지 검증한다
 spring:
   config:
     activate:
@@ -8,12 +8,9 @@ spring:
     url: jdbc:h2:mem:mini8;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
     username: sa
     password:
-  flyway:
-    enabled: true
-    locations: classpath:db/mariadb
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
 
 jwt:
   secret: test-only-secret-key-must-be-at-least-32-bytes-long
@@ -28,4 +25,4 @@ gemini:
   prompt-version: v1
 
 app:
-  cors-origin: http://localhost:5173
+  cors-origins: http://localhost:8080,http://localhost:5173
