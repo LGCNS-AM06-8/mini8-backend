@@ -1,9 +1,7 @@
 package com.mini8.backend.database.User.domain.entity;
 
 
-import com.mini8.backend.database.Tech.domain.entity.TechTagEntity;
-
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -14,21 +12,28 @@ import jakarta.persistence.ManyToOne;
 
 import jakarta.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 
 @Entity
-@Table(name = "USER_SKILL")
-public class UserSkillEntity {
+@Table(name = "USER_JOB_FIELD")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserJobFieldEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(nullable = false)
+    private String jobField;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private AppUserEntity user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tech_tag_id")
-    private TechTagEntity techTag;
 }
-
