@@ -1,0 +1,22 @@
+package com.mini8.backend.features.tech.ctrl;
+
+import com.mini8.backend.features.tech.service.TechService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/tech-tags")
+@RequiredArgsConstructor
+public class TechController {
+
+  private final TechService techService;
+
+  // getTechList: 기술 칩 목록 불러오기
+  @GetMapping("/")
+  public ResponseEntity<?> getTechList() {
+    return null;
+  }
+}
