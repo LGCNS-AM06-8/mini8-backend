@@ -1,0 +1,32 @@
+#!/bin/sh
+# 커밋 메시지가 팀 규칙에 맞는지 검사한다.
+#   <type>(<scope>): <설명>       예) feat(auth): 구글 로그인 토큰 검증
+#   type = feat fix docs style refactor test chore
+#   되돌릴 수 없는 변경은 콜론 앞에 !   예) refactor(auth)!: 토큰 전달 방식 변경
+#   임시 저장은 wip: ...  (PR 보내기 전에 하나로 합칩니다)
+
+msg=$(head -n 1 "$1")
+
+# 병합·되돌리기 커밋은 깃이 만드는 문구라 검사하지 않는다
+case "$msg" in
+  "Merge "*|"Revert "*) exit 0 ;;
+esac
+
+pattern='^(feat|fix|docs|style|refactor|test|chore)(\([a-z0-9/_-]+\))?!?: .+|^wip: .+'
+
+echo "$msg" | grep -Eq "$pattern"
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "  커밋 메시지 형식이 맞지 않습니다."
+  echo "  받은 것 : $msg"
+  echo ""
+  echo "  형식    : <type>(<scope>): <설명>"
+  echo "  type    : feat fix docs style refactor test chore"
+  echo "  예      : feat(auth): 구글 로그인 토큰 검증"
+  echo "            fix(post): 목록 정렬이 최신순으로 안 되는 문제"
+  echo "            chore: 의존성 정리"
+  echo ""
+  echo "  자세한 규칙은 CONTRIBUTING.md 를 보세요."
+  echo ""
+  exit 1
+fi
