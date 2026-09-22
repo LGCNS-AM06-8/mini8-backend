@@ -22,9 +22,9 @@ public class ProfileResponseDTO {
 
   private Integer careerYears;
 
-  private List<SkillResponseDTO> haveSkillIds;
+  private List<SkillResponseDTO> haveSkills;
 
-  private List<SkillResponseDTO> wantSkillIds;
+  private List<SkillResponseDTO> wantSkills;
 
   private int profileVersion;
 
