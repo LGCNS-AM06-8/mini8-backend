@@ -1,6 +1,8 @@
 package com.mini8.backend.features.user.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mini8.backend.commons.exception.BusinessException;
+import com.mini8.backend.commons.exception.ErrorCode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -30,28 +32,14 @@ public class GoogleUserInfoClient {
         .retrieve()
         // 잘못된 Google Access Token 처리
         .onStatus(
-            HttpStatusCode::is4xxClientError,
+            HttpStatusCode::isError,
             (request, response) -> {
-              throw new InvalidGoogleTokenException();
+              throw new BusinessException(ErrorCode.INVALID_GOOGLE_TOKEN);
             })
         .body(GoogleUserInfo.class);
   }
 
-  // Google 응답에서 필요한 값만 사용
+  // Google의 id는 app_user.google_sub와 연결하는 변경되지 않는 사용자 식별자다.
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record GoogleUserInfo(String id, String email, String name) {}
-
-  // 공통 예외 적용 전 임시 예외
-  public static class InvalidGoogleTokenException extends RuntimeException {
-
-    public static final String CODE = "INVALID_GOOGLE_TOKEN";
-
-    public InvalidGoogleTokenException() {
-      super("유효하지 않은 Google Access Token입니다.");
-    }
-
-    public String getCode() {
-      return CODE;
-    }
-  }
 }
