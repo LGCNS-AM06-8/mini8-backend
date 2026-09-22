@@ -8,8 +8,8 @@
 | 무엇 | 어디 |
 |---|---|
 | API 16행 (요청 · 응답 · 오류 · 예시) | 노션 산출물 체크리스트 6번 「API 명세서」 |
+| AI 가이드 응답 규격 | 같은 명세의 `POST /api/posts/{id}/guide` 행. 저장소에 사본 없음 |
 | 오류 응답 형식 | `{code, message, field}`. 스택 트레이스 금지 |
-| AI 가이드 응답 규격 | `summary` · `readingOrder` · `sections[{seq, level, reason}]` · `notes[3]`. `level`은 `core` · `normal` · `skip` |
 
 규격을 바꿔야 하면 `backend-issue`·`frontend-issue` 포럼에 올립니다. 노션을 먼저 고치고 코드를 맞춥니다.
 

@@ -1,9 +1,9 @@
 # mini8-backend
 
-기술블로그 읽기 가이드 서버입니다. Spring Boot 3.4.5 · Java 17 · MariaDB · Flyway · JWT.
+기술블로그 읽기 가이드 서버입니다. Spring Boot 3.4.5 · Java 17 · MariaDB · JPA · JWT.
 구조는 수업 프로젝트(inspire_jpa)와 같습니다.
 
-지금은 빈 뼈대입니다. 폴더와 빌드 설정만 있고 코드는 없습니다. 담당이 정해지면 각자 자기 폴더를 채우시면 됩니다.
+누가 어디를 고치는지는 `AGENTS.md` 「소유 지도」에 있습니다.
 
 ## 시작하기
 
@@ -24,7 +24,7 @@ JDK 는 17 이어야 합니다. `build.gradle` toolchain 이 17 고정이라 21 
 
 MariaDB 에 `mini8` 데이터베이스를 만들어 두시면 됩니다.
 `CREATE DATABASE mini8 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
-문자셋을 지정하지 않으면 글 제목의 한글과 이모지가 깨집니다. 표는 `db/mariadb/V1__init.sql` 이 들어오면 Flyway가 기동할 때 만듭니다. 지금은 SQL이 없어서 표가 안 만들어집니다.
+문자셋을 지정하지 않으면 글 제목의 한글과 이모지가 깨집니다. 표는 서버가 뜰 때 `database/entity` 의 엔티티에서 만들어집니다(`ddl-auto: update`).
 
 ## 커밋할 때 자동으로 도는 검사
 
@@ -41,42 +41,30 @@ MariaDB 에 `mini8` 데이터베이스를 만들어 두시면 됩니다.
 
 ```
 com.mini8.backend
-├─ commons/            공통
+├─ commons/            공통 (박준우)
 │  ├─ config/          SecurityConfig · SwaggerConfig
 │  ├─ filter/          요청 헤더 토큰을 사용자로
 │  ├─ token/           JWT 발급 · 검증
 │  ├─ exception/       ErrorCode · BusinessException
 │  └─ handler/         전역 예외 처리 · 오류 응답
+├─ database/entity/    JPA 엔티티 10개 (노건우). 표의 원천, 한 자리에 한 벌
 └─ features/{도메인}/
    ├─ ctrl/            컨트롤러 (경로와 상태코드만, 로직 없음)
    ├─ service/         업무 로직
-   ├─ repository/      JPA
-   └─ domain/          entity · dto
+   ├─ repository/      JPA (제네릭은 database/entity 의 클래스)
+   └─ domain/dto/      요청 · 응답 DTO
 ```
 
-도메인은 여섯입니다. `user` · `tech` · `company` · `post` · `guide` · `bookmark`.
+도메인은 일곱입니다. `user` · `tech` · `company` · `post` · `guide` · `bookmark` · `collect`.
 
 ## 규약
 
 - 정상 응답은 봉투 없이 DTO 그대로 내립니다. 오류만 `{code, message, field}` 입니다
 - 토큰은 응답 헤더 `Authorization: Bearer …` 와 `Refresh-Token` 으로 보냅니다. 프론트는 `Authorization` 헤더로 보냅니다
 - 컨트롤러에서 사용자는 `@AuthenticationPrincipal Long userId` 로 받습니다
-- 표를 바꿀 때는 엔티티가 아니라 `db/mariadb/V{n}__*.sql` 을 추가합니다 (`ddl-auto: none`)
+- 표를 바꿀 때는 `database/entity` 의 엔티티를 고칩니다 (DB 담당). SQL 파일은 쓰지 않습니다
 - 이름은 Java camelCase · 클래스 PascalCase · DB snake_case · JSON camelCase · URL 소문자 복수형
 
 ## 아직 없는 것
 
-담당이 정해진 뒤에 만듭니다.
-
-| 무엇 | 어디에 |
-|---|---|
-| 표를 만드는 SQL | `db/mariadb/V1__init.sql` |
-| 인증 설정과 JWT | `commons/` |
-| 도메인 여섯의 컨트롤러 · 서비스 · 리포지토리 · 엔티티 · DTO | `features/{도메인}/` |
-
-스키마 초안은 디스코드 `db-task` 포럼의 `D1  V1 스키마` 게시물에 첨부돼 있습니다.
-커밋 `35163f9` 에도 초안이 남아 있으나 **구버전입니다.** 그쪽을 쓰면 나중에 Flyway 체크섬이 어긋납니다.
-엔티티·DTO는 `35163f9` 를 참고용으로 볼 수 있습니다. 스키마는 반드시 D1 첨부본을 쓰십시오.
-
-설계 근거는 노션 ERD와 API 명세서에 있습니다.
-수집 데이터 수치(기업 8곳 · 402편 · 섹션 4,514개)는 디스코드 작업 포럼 게시물에 필요한 값만 적어 두었습니다.
+작업 목록과 순서는 디스코드 `backend-task` · `db-task` · `crawling-task` 포럼에 있습니다. 설계 근거는 노션 ERD와 API 명세서에 있습니다.
