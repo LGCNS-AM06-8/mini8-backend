@@ -21,6 +21,7 @@ public class UserService {
         UserEntity user = UserEntity.builder()
                 .google_sub(request.getGoogle_sub())
                 .name(request.getName())
+                // 구글 로그인시 이름 여기방향으로 추가 
                 .career_years(request.getCareer_years())
                 .profile_version(request.getProfile_version())
                 .refresh_token(request.getRefresh_token())

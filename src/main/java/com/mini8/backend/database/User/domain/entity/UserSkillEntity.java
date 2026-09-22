@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "USER_SKILL")
+@Table(name = "user_skill")
 @Getter
 @Builder
 @NoArgsConstructor
@@ -37,5 +37,5 @@ public class UserSkillEntity {
     private TechTagEntity techTag;
 
     @Column(name = "skill_type", nullable = false, length = 10)
-    private String skill_type;
+    private String skill_type; // HAVE 또는 WANT
 }

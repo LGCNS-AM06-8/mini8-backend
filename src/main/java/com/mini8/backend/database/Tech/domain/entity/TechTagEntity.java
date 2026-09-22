@@ -23,7 +23,7 @@ import lombok.ToString;
 
 
 @Entity
-@Table(name = "TECH_TAG")
+@Table(name = "tech_tag")
 public class TechTagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
