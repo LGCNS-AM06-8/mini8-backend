@@ -18,7 +18,7 @@ public class ProfileRequestDTO {
 
   private Integer careerYears;
 
-  private List<Integer> haveSkills;
+  private List<Integer> haveSkillIds;
 
-  private List<Integer> wantSkills;
+  private List<Integer> wantSkillIds;
 }
