@@ -3,6 +3,9 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -18,6 +21,8 @@ import jakarta.persistence.UniqueConstraint;
     }
 )
 public class BookmarkEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookmark_id;
     private Long user_id;
     private Long blog_post_id;
