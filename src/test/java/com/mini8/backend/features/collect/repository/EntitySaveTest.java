@@ -1,4 +1,4 @@
-package com.mini8.backend.features.collect.repository;
+package com.mini8.backend.database.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

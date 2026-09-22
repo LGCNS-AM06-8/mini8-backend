@@ -2,14 +2,14 @@ package com.mini8.backend.features.collect.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.mini8.backend.database.repository.BlogPostCategoryRepository;
+import com.mini8.backend.database.repository.BlogPostRepository;
+import com.mini8.backend.database.repository.BlogPostSectionRepository;
+import com.mini8.backend.database.repository.BlogPostTagRepository;
+import com.mini8.backend.database.repository.CompanyRepository;
+import com.mini8.backend.database.repository.TechTagRepository;
 import com.mini8.backend.features.collect.domain.dto.ImportedPost;
 import com.mini8.backend.features.collect.domain.dto.TechDictionary;
-import com.mini8.backend.features.collect.repository.BlogPostCategoryRepository;
-import com.mini8.backend.features.collect.repository.BlogPostRepository;
-import com.mini8.backend.features.collect.repository.BlogPostSectionRepository;
-import com.mini8.backend.features.collect.repository.BlogPostTagRepository;
-import com.mini8.backend.features.collect.repository.CompanyRepository;
-import com.mini8.backend.features.collect.repository.TechTagRepository;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
