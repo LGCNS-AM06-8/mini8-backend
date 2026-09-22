@@ -16,7 +16,7 @@ public class ProfileRequestDTO {
 
   private List<String> jobFields;
 
-  private int careerYears;
+  private Integer careerYears;
 
   private List<Integer> haveSkillIds;
 

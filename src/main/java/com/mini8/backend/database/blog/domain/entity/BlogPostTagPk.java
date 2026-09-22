@@ -1,8 +1,7 @@
 package com.mini8.backend.database.blog.domain.entity;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class BlogPostTagPk implements Serializable {
 
-    private Long blog_post_id;
+  private Long blog_post_id;
 
-    private Long tech_tag_id;
+  private Long tech_tag_id;
 }

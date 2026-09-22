@@ -1,8 +1,7 @@
 package com.mini8.backend.database.User.domain.entity;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,8 +14,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class UserSkillPk implements Serializable {
 
-    private Long userId;
+  private Long userId;
 
-    private Long techTagId;
-    
+  private Long techTagId;
 }
