@@ -1,30 +1,49 @@
 package com.mini8.backend.commons.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mini8.backend.commons.filter.JwtAuthenticationFilter;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-/**
- * 1일차용 최소 보안 설정. Swagger 와 모든 경로를 열어 두고 CORS 만 건다.
- *
- * <p>S1(JWT 필터)이 들어오면 박준우님이 anyRequest() 를 authenticated() 로 바꾸고 필터를 등록한다. 토큰 없이 부를 수 있는 경로는 노션 명세
- * 「인증 불필요」 행 = /api/auth/**, /api/tech-tags, GET /api/companies/{id}.
- */
+/** JWT 인증 필터, URL별 접근 정책, CORS를 구성한다. */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+  public static final String BEARER_AUTH_SCHEME = "bearerAuth";
+
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final ObjectMapper objectMapper;
+
   @Value("${app.cors-origins}")
   private List<String> corsOrigins;
+
+  public SecurityConfig(
+      JwtAuthenticationFilter jwtAuthenticationFilter, ObjectMapper objectMapper) {
+    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.objectMapper = objectMapper;
+  }
 
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,16 +52,36 @@ public class SecurityConfig {
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .httpBasic(b -> b.disable())
         .formLogin(f -> f.disable())
+        .exceptionHandling(
+            exceptions ->
+                exceptions.authenticationEntryPoint(
+                    (request, response, exception) -> writeUnauthorized(response)))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
                     .permitAll()
-                    .requestMatchers("/api/auth/**", "/api/tech-tags")
+                    .requestMatchers("/api/auth/**")
                     .permitAll()
-                    // S1 전까지 전부 허용. S1 에서 authenticated() 로 조인다
+                    .requestMatchers(HttpMethod.GET, "/api/tech-tags")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/companies/{id}")
+                    .permitAll()
+                    .requestMatchers("/api/admin/**")
+                    .hasRole("ADMIN")
                     .anyRequest()
-                    .permitAll());
+                    .authenticated())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
+  }
+
+  @Bean
+  OpenAPI openAPI() {
+    SecurityScheme bearerScheme =
+        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT");
+
+    return new OpenAPI()
+        .components(new Components().addSecuritySchemes(BEARER_AUTH_SCHEME, bearerScheme))
+        .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH_SCHEME));
   }
 
   @Bean
@@ -57,5 +96,17 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
     return source;
+  }
+
+  private void writeUnauthorized(HttpServletResponse response) throws IOException {
+    ObjectNode body = objectMapper.createObjectNode();
+    body.put("code", "UNAUTHORIZED");
+    body.put("message", "인증이 필요합니다.");
+    body.putNull("field");
+
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+    objectMapper.writeValue(response.getWriter(), body);
   }
 }
