@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class TechTagEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer tech_tag_id;
+  private Long tech_tag_id;
 
   @Column(nullable = false, unique = true, length = 50)
   private String name;

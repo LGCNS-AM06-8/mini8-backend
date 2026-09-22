@@ -35,5 +35,5 @@ public class BlogPostTagEntity {
   private TechTagEntity techTag;
 
   @Column(nullable = true)
-  private Integer tag_rang;
+  private Integer tag_rank;
 }
