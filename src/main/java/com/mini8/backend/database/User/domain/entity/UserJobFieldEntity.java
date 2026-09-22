@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 
 
 @Entity
-@Table(name = "USER_JOB_FIELD")
+@Table(name = "user_job_field")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,10 +30,12 @@ public class UserJobFieldEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private String jobField;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    @Column(nullable = false,length = 10)
+    private String jobField;
+
+    
 }
