@@ -24,6 +24,10 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "tech_tag")
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TechTagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

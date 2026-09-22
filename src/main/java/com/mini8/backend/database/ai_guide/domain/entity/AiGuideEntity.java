@@ -13,6 +13,10 @@ import jakarta.persistence.Id;
 
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "ai_guide", uniqueConstraints = {
@@ -27,6 +31,10 @@ import jakarta.persistence.UniqueConstraint;
         )
     }
 )
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AiGuideEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

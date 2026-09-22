@@ -8,6 +8,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "bookmark", uniqueConstraints = {
@@ -20,6 +24,10 @@ import jakarta.persistence.UniqueConstraint;
         )
     }
 )
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookmarkEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
