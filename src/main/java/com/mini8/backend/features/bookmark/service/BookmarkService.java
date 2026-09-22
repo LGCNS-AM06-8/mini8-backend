@@ -2,9 +2,9 @@ package com.mini8.backend.features.bookmark.service;
 
 import com.mini8.backend.commons.exception.BusinessException;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
-import com.mini8.backend.database.User.repository.UserRepository;
+import com.mini8.backend.database.repository.UserRepository;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
-import com.mini8.backend.database.blog.repository.BlogPostRepository;
+import com.mini8.backend.database.repository.BlogPostRepository;
 import com.mini8.backend.database.bookmark.domain.entity.BookmarkEntity;
 import com.mini8.backend.features.bookmark.domain.dto.BookmarkResponseDTO;
 import com.mini8.backend.features.bookmark.repository.BookmarkRepository;
@@ -18,7 +18,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
-import org.flywaydb.core.api.ErrorCode;
+import com.mini8.backend.commons.exception.ErrorCode;
 
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,8 @@ import org.springframework.stereotype.Service;
 public class BookmarkService {
 
   private final BookmarkRepository bookmarkRepository;
- 
+  private final UserRepository userRepository;
+  private final BlogPostRepository blogPostRepository;
 
 
   @Transactional
