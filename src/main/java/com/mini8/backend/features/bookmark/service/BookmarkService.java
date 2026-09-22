@@ -1,5 +1,6 @@
 package com.mini8.backend.features.bookmark.service;
 
+import com.mini8.backend.commons.exception.BusinessException;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.User.repository.UserRepository;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
