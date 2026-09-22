@@ -66,6 +66,10 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/companies/{id}")
                     .permitAll()
+                    // 초기 402편 적재용. 관리자 계정을 만드는 길이 아직 없어 잠시 열어 둔다.
+                    // ADMIN 계정이 생기면 이 줄을 지우고 아래 hasRole("ADMIN") 에 맡긴다 (C3)
+                    .requestMatchers(HttpMethod.POST, "/api/admin/collect/import")
+                    .permitAll()
                     .requestMatchers("/api/admin/**")
                     .hasRole("ADMIN")
                     .anyRequest()
