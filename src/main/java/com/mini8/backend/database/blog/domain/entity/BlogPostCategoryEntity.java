@@ -2,6 +2,10 @@ package com.mini8.backend.database.blog.domain.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,4 +20,10 @@ import lombok.NoArgsConstructor;
 public class BlogPostCategoryEntity {
     @EmbeddedId
     private BlogPostCategoryPk id;
+
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("blog_post_id")
+    @JoinColumn(name = "blog_post_id", nullable = false)
+    private BlogPostEntity blogPost;
 }

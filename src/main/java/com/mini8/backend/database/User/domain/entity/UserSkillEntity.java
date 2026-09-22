@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class UserSkillEntity {
 
     @EmbeddedId
-    private UserSkillId id;
+    private UserSkillPk id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("userId")

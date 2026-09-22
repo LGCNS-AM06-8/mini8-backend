@@ -2,16 +2,29 @@ package com.mini8.backend.database.blog.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 @Entity
-@Table(name = "blog_post_section")
+@Table(name = "blog_post_section", uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_blog_post_section",
+            columnNames = {
+                "blog_post_id",
+                "seq",
+            }
+        )
+    }
+)
 @Getter
 @Builder
 @NoArgsConstructor
@@ -21,8 +34,9 @@ public class BlogPostSectionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long section_id;   
     
-    @Column(nullable = false)
-    private Long blog_post_id;     
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "blog_post_id", nullable = false)
+    private BlogPostEntity blogPost;     
 
     @Column(nullable = false)
     private Integer seq;           

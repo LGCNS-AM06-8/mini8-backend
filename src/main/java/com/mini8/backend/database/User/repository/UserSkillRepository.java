@@ -4,8 +4,8 @@ package com.mini8.backend.database.User.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.mini8.backend.database.User.domain.entity.UserSkillEntity;
-import com.mini8.backend.database.User.domain.entity.UserSkillId;
+import com.mini8.backend.database.User.domain.entity.UserSkillPk;
 
-public interface UserSkillRepository extends JpaRepository<UserSkillEntity, UserSkillId> {
+public interface UserSkillRepository extends JpaRepository<UserSkillEntity, UserSkillPk> {
 
 }

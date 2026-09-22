@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class UserSkillId implements Serializable {
+public class UserSkillPk implements Serializable {
 
     private Long userId;
 
