@@ -14,42 +14,43 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 @Entity
-@Table(name = "blog_post_section", uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_blog_post_section",
-            columnNames = {
-                "blog_post_id",
-                "seq",
-            }
-        )
-    }
-)
+@Table(
+    name = "blog_post_section",
+    uniqueConstraints = {
+      @UniqueConstraint(
+          name = "uk_blog_post_section",
+          columnNames = {
+            "blog_post_id",
+            "seq",
+          })
+    })
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlogPostSectionEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long section_id;   
-    
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "blog_post_id", nullable = false)
-    private BlogPostEntity blogPost;     
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long section_id;
 
-    @Column(nullable = false)
-    private Integer seq;           
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "blog_post_id", nullable = false)
+  private BlogPostEntity blogPost;
 
-    @Column(nullable = false,length = 300)
-    private String heading; 
-    
-    @Column(nullable = true,length = 4)
-    private String level;   
-    
-    @Column(nullable = false,columnDefinition = "MEDIUMTEXT")
-    private String content_text;   
+  @Column(nullable = false)
+  private Integer seq;
 
-    @Column(nullable = false)
-    private Integer char_count;  
+  @Column(nullable = false, length = 300)
+  private String heading;
+
+  @Column(nullable = true, length = 4)
+  private String level;
+
+  @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
+  private String content_text;
+
+  @Column(nullable = false)
+  private Integer char_count;
 }
