@@ -60,13 +60,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       validateAccessToken(parsedToken);
 
       // role을 Spring Security 권한 형식으로 변환
-      SimpleGrantedAuthority authority =
-          new SimpleGrantedAuthority("ROLE_" + parsedToken.role());
+      SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + parsedToken.role());
 
       // userId를 principal로 인증 객체 생성
       UsernamePasswordAuthenticationToken authentication =
-          new UsernamePasswordAuthenticationToken(
-              parsedToken.userId(), null, List.of(authority));
+          new UsernamePasswordAuthenticationToken(parsedToken.userId(), null, List.of(authority));
 
       authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

@@ -1,5 +1,5 @@
 package com.mini8.backend.database.blog.domain.entity;
-import jakarta.persistence.Column;
+
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "blog_post_category")
 @Getter
@@ -18,12 +19,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlogPostCategoryEntity {
-    @EmbeddedId
-    private BlogPostCategoryPk id;
+  @EmbeddedId private BlogPostCategoryPk id;
 
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("blog_post_id")
-    @JoinColumn(name = "blog_post_id", nullable = false)
-    private BlogPostEntity blogPost;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @MapsId("blog_post_id")
+  @JoinColumn(name = "blog_post_id", nullable = false)
+  private BlogPostEntity blogPost;
 }

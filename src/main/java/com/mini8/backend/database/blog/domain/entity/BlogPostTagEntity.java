@@ -1,6 +1,6 @@
 package com.mini8.backend.database.blog.domain.entity;
-import com.mini8.backend.database.Tech.domain.entity.TechTagEntity;
 
+import com.mini8.backend.database.Tech.domain.entity.TechTagEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -21,21 +21,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlogPostTagEntity {
-    @EmbeddedId
-    private BlogPostTagPk id;
+  @EmbeddedId private BlogPostTagPk id;
 
-    // fk관계 복합pk시 Maps사용 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("blog_post_id")
-    @JoinColumn(name = "blog_post_id", nullable = false)
-    private BlogPostEntity blogPost;
+  // fk관계 복합pk시 Maps사용
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @MapsId("blog_post_id")
+  @JoinColumn(name = "blog_post_id", nullable = false)
+  private BlogPostEntity blogPost;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("tech_tag_id")
-    @JoinColumn(name = "tech_tag_id", nullable = false)
-    private TechTagEntity techTag;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @MapsId("tech_tag_id")
+  @JoinColumn(name = "tech_tag_id", nullable = false)
+  private TechTagEntity techTag;
 
-
-    @Column(nullable = true)
-    private Integer tag_rank;
+  @Column(nullable = true)
+  private Integer tag_rank;
 }
