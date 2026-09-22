@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 /**
  * 수집 단계가 만든 파일을 읽어 표에 넣는 입구.
  *
- * <p>저장은 {@link PostIngestService} 가 한다. 이 클래스는 파일에서 읽어 넘기는 일만 맡는다. 나중에 웹에서 수집한 글을 넘기는 입구가
- * 하나 더 생겨도 저장 쪽은 그대로 쓴다.
+ * <p>저장은 {@link PostIngestService} 가 한다. 이 클래스는 파일에서 읽어 넘기는 일만 맡는다. 나중에 웹에서 수집한 글을 넘기는 입구가 하나 더 생겨도
+ * 저장 쪽은 그대로 쓴다.
  */
 @Service
 public class PostImportService {
@@ -36,8 +36,7 @@ public class PostImportService {
 
   public PostIngestService.IngestResult importFromFiles() {
     if (dataDir == null || dataDir.isBlank()) {
-      throw new IllegalStateException(
-          "수집 파일 폴더가 정해지지 않았습니다. .env 에 COLLECT_DATA_DIR 을 적어 주세요.");
+      throw new IllegalStateException("수집 파일 폴더가 정해지지 않았습니다. .env 에 COLLECT_DATA_DIR 을 적어 주세요.");
     }
     Path dir = Path.of(dataDir);
     if (!Files.isDirectory(dir)) {

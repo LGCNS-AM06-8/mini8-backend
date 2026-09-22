@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 /**
  * 수집 단계에서 만든 파일을 읽는다.
  *
- * <p>분류 파일에는 AI 결과가, 본문 파일에는 HTML·텍스트·소제목이 들어 있다. 같은 글이 양쪽에 한 번씩 있고 url 이 같다. 둘을 합쳐 글 한 편을
- * 온전한 모양으로 만든다.
+ * <p>분류 파일에는 AI 결과가, 본문 파일에는 HTML·텍스트·소제목이 들어 있다. 같은 글이 양쪽에 한 번씩 있고 url 이 같다. 둘을 합쳐 글 한 편을 온전한 모양으로
+ * 만든다.
  */
 @Service
 public class ImportFileReader {

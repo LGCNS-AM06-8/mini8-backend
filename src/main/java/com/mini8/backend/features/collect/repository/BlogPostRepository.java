@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
   Optional<BlogPostEntity> findByUrl(String url);
+
   boolean existsByUrl(String url);
 }

@@ -1,7 +1,7 @@
 package com.mini8.backend.features.collect;
 
-import com.mini8.backend.features.collect.service.PostIngestService;
 import com.mini8.backend.features.collect.service.PostImportService;
+import com.mini8.backend.features.collect.service.PostIngestService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

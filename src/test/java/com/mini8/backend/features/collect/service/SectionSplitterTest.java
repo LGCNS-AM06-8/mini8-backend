@@ -14,8 +14,18 @@ class SectionSplitterTest {
 
   private ImportedPost post(String body, List<ImportedPost.Heading> headings) {
     return new ImportedPost(
-        "우아한형제들", null, "제목", "https://example.com/1", "2026-09-18", 100, true,
-        List.of(), headings, "<h2>x</h2>", body, null);
+        "우아한형제들",
+        null,
+        "제목",
+        "https://example.com/1",
+        "2026-09-18",
+        100,
+        true,
+        List.of(),
+        headings,
+        "<h2>x</h2>",
+        body,
+        null);
   }
 
   @Test

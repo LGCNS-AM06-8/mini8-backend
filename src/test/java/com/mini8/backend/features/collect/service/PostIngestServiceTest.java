@@ -54,8 +54,7 @@ class PostIngestServiceTest {
         true,
         List.of("AI", "Backend", "AI"),
         List.of(
-            new ImportedPost.Heading(1, "h2", "들어가며"),
-            new ImportedPost.Heading(2, "h2", "문제 상황")),
+            new ImportedPost.Heading(1, "h2", "들어가며"), new ImportedPost.Heading(2, "h2", "문제 상황")),
         "<h2>들어가며</h2>",
         "들어가며 첫 문단입니다. 문제 상황 두 번째 문단입니다.",
         new ImportedPost.Ai(true, techs, "Backend", "중급", "한 줄 요지"));
@@ -123,8 +122,7 @@ class PostIngestServiceTest {
   @DisplayName("모르는 기업의 글은 건너뛴다")
   void 모르는_기업은_건너뛴다() {
     PostIngestService.IngestResult result =
-        service.ingest(
-            List.of(post("https://a.com/9", "없는회사", List.of("Redis"))), dictionary());
+        service.ingest(List.of(post("https://a.com/9", "없는회사", List.of("Redis"))), dictionary());
 
     assertThat(result.newPosts()).isZero();
     assertThat(result.skipped()).isEqualTo(1);
