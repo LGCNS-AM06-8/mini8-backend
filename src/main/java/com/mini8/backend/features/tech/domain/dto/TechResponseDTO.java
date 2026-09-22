@@ -1,12 +1,9 @@
 package com.mini8.backend.features.tech.domain.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import java.util.List;
 
-@Builder
-@Getter
-@ToString
-@NoArgsConstructor
-public class TechResponseDTO {}
+/** GET /api/tech-tags 응답. 기술 칩 목록. */
+public record TechResponseDTO(List<TechTagDTO> techTags) {
+
+  public record TechTagDTO(Long techTagId, String name, String field) {}
+}
