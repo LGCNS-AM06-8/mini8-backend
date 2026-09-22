@@ -1,8 +1,7 @@
 package com.mini8.backend.database.User.controller;
 import org.springframework.web.bind.annotation.*;
 
-import com.mini8.backend.database.TechBlog.domain.dto.TechBlogRequestDTO;
-import com.mini8.backend.database.TechBlog.service.TechBlogService;
+
 
 import lombok.RequiredArgsConstructor;
 
