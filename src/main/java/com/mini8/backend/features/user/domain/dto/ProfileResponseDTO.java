@@ -14,15 +14,19 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ProfileResponseDTO {
 
+  private String name;
+
   private int userId;
 
   private List<String> jobFields;
 
-  private int careerYears;
+  private Integer careerYears;
 
-  private List<Integer> haveSkillIds;
+  private List<SkillResponseDTO> haveSkills;
 
-  private List<Integer> wantSkillIds;
+  private List<SkillResponseDTO> wantSkills;
 
   private int profileVersion;
+
+  public record SkillResponseDTO(int techTagId, String name) {}
 }

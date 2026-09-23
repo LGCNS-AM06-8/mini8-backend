@@ -1,12 +1,16 @@
 package com.mini8.backend.features.user.ctrl;
 
+import com.mini8.backend.features.user.domain.dto.UserRequestDTO;
 import com.mini8.backend.features.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +28,14 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "로그인 실패(access token으로 Google userinfo 조회 실패)")
   })
   @PostMapping("/google")
-  public ResponseEntity<?> signIn() {
-    return null;
+  public ResponseEntity<?> signIn(@RequestBody UserRequestDTO request) {
+    UserService.LoginResult result = userService.signIn(request.getGoogleAccessToken());
+
+    // 우리 서비스에서 사용할 JWT는 바디가 아닌 응답 헤더로 전달한다.
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.accessToken())
+        .header("Refresh-Token", result.refreshToken())
+        .body(result.response());
   }
 
   // signOut: OAuth 로그아웃

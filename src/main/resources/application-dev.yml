@@ -38,3 +38,13 @@ gemini:
 
 app:
   cors-origins: http://localhost:8080,http://localhost:5173   # FE Vite 는 8080 (vite.config.ts). 5173 은 예비
+
+collect:
+  # 수집 단계가 만든 파일이 있는 폴더. 저장소에 넣기엔 커서(21MB) 각자 컴퓨터 경로를 .env 에 적는다
+  # classified.jsonl · posts_12m*.jsonl 3개 · tech_dict.json 이 이 안에 있어야 한다
+  data-dir: ${COLLECT_DATA_DIR:}
+  # AI 1차 분류에 쓴 조건. 새 글을 분류할 때도 같아야 결과가 어긋나지 않는다 (C3)
+  classify:
+    model: gemini-2.5-flash
+    body-chars: 7000
+    temperature: 0
