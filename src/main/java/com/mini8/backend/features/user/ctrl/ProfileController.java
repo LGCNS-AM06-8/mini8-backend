@@ -1,12 +1,15 @@
 package com.mini8.backend.features.user.ctrl;
 
 import com.mini8.backend.features.user.domain.dto.ProfileRequestDTO;
+import com.mini8.backend.features.user.domain.dto.ProfileResponseDTO;
 import com.mini8.backend.features.user.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,8 +41,9 @@ public class ProfileController {
     @ApiResponse(responseCode = "401", description = "프로필 조회 실패(토큰 유효성 확인)"),
   })
   @GetMapping
-  public ResponseEntity<?> getProfile() {
-    return null;
+  public ResponseEntity<?> getProfile(@AuthenticationPrincipal Long userId) {
+    ProfileResponseDTO response = profileService.getProfile(userId);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @Operation(summary = "프로필 수정", description = "프로필을 저장하고 프로필 버전을 증가")
