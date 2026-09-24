@@ -43,4 +43,8 @@ public class CompanyEntity {
 
   @Column(nullable = false, length = 20)
   private String feed_type;
+
+  @Builder.Default
+  @Column(nullable = false)
+  private Integer max_page = 1;
 }
