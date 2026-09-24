@@ -40,10 +40,10 @@ public class BlogPostEntity {
   @Column(nullable = false, length = 300)
   private String title;
 
-  @Column(nullable = false, length = 500)
+  @Column(nullable = false)
   private LocalDateTime published_at;
 
-  @Column(nullable = true)
+  @Column(nullable = true, length = 500)
   private String excerpt;
 
   @Column(columnDefinition = "MEDIUMTEXT", nullable = false)
