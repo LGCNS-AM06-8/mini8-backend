@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +30,13 @@ public class BookmarkController {
     @ApiResponse(responseCode = "409", description = "북마크 추가 실패(이미 존재하는 글)")
   })
   @PostMapping("/{postId}")
-  public ResponseEntity<?> addBookmark(@PathVariable("userId") int userId) {
+  public ResponseEntity<?> addBookmark(@AuthenticationPrincipal Long userId,@PathVariable("postId") Long postId) {
+
+    System.out.println("debug >>>> before addBookmark userId : "+ userId + "postId"+ postId);
+    //bookmarkService.addBookmark(userId,postId);  
+
+
+
     return null;
   }
 
@@ -40,7 +47,10 @@ public class BookmarkController {
     @ApiResponse(responseCode = "401", description = "북마크 조회 실패(토큰 유효성 확인)")
   })
   @GetMapping
-  public ResponseEntity<?> getBookmark() {
+  public ResponseEntity<?> getBookmark(@AuthenticationPrincipal Long userId) {
+    System.out.println("debug >>>> before getBookmark userId : "+ userId );
+    //bookmarkService.getBookmark(userId);  
+    
     return null;
   }
 
@@ -52,7 +62,9 @@ public class BookmarkController {
     @ApiResponse(responseCode = "404", description = "북마크 삭제 실패(해당 글을 북마크에서 찾을 수 없음)")
   })
   @DeleteMapping("/{postId}")
-  public ResponseEntity<?> deleteBookmark(@PathVariable("userId") int userId) {
+  public ResponseEntity<?> deleteBookmark(@AuthenticationPrincipal Long userId,@PathVariable("postId") Long postId) {
+    System.out.println("debug >>>> before deleteBookmark userId : "+ userId + "postId"+ postId);
+    //bookmarkService.deleteBookmark(userId,postId);
     return null;
   }
 }
