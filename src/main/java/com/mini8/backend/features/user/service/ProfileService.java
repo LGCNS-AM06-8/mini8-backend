@@ -39,7 +39,7 @@ public class ProfileService {
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
     if (user.getProfile_version() != 0) {
-      throw new BusinessException(ErrorCode.INVALID_INPUT);
+      throw new BusinessException(ErrorCode.PROFILE_ALREADY_EXISTS);
     }
 
     // app_user 저장

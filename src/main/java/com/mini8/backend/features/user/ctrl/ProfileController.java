@@ -28,7 +28,8 @@ public class ProfileController {
   @ApiResponses({
     @ApiResponse(responseCode = "201", description = "프로필 저장 성공"),
     @ApiResponse(responseCode = "400", description = "프로필 저장 실패(입력값 오류)"),
-    @ApiResponse(responseCode = "401", description = "프로필 저장 실패(토큰 유효성 확인)")
+    @ApiResponse(responseCode = "401", description = "프로필 저장 실패(토큰 유효성 확인)"),
+    @ApiResponse(responseCode = "409", description = "프로필 저장 실패(이미 등록된 프로필)")
   })
   @PostMapping
   public ResponseEntity<?> setProfile(
