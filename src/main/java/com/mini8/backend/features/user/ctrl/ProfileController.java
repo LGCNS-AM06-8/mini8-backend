@@ -53,7 +53,9 @@ public class ProfileController {
     @ApiResponse(responseCode = "401", description = "프로필 수정 성공(토큰 유효성 확인)")
   })
   @PutMapping
-  public ResponseEntity<?> editProfile(@RequestBody ProfileRequestDTO request) {
-    return null;
+  public ResponseEntity<?> editProfile(
+      @AuthenticationPrincipal Long userId, @RequestBody ProfileRequestDTO request) {
+    ProfileResponseDTO response = profileService.editProfile(userId, request);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 }
