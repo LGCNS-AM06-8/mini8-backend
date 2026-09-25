@@ -36,7 +36,7 @@ public void addBookmark(Long userId, Long postId) {
 
     UserEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
-            // 예외 import 추가 Readme에서는 commons에exception에존재 하지만 없음
+           
     BlogPostEntity blogPost = blogPostRepository.findById(postId)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
@@ -85,7 +85,7 @@ public void addBookmark(Long userId, Long postId) {
     );
   }
 
-  public BookmarkResponseDTO deleteBookmark() {
+  public BookmarkResponseDTO deleteBookmark(Long userId, Long postId) {
     return null;
   }
 }

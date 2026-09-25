@@ -31,6 +31,12 @@ public class BookmarkController {
   })
   @PostMapping("/{postId}")
   public ResponseEntity<?> addBookmark(@AuthenticationPrincipal Long userId,@PathVariable("postId") Long postId) {
+
+    System.out.println("debug >>>> before addBookmark userId : "+ userId + "postId"+ postId);
+    bookmarkService.addBookmark(userId,postId);  
+
+
+
     return null;
   }
 
@@ -41,7 +47,10 @@ public class BookmarkController {
     @ApiResponse(responseCode = "401", description = "북마크 조회 실패(토큰 유효성 확인)")
   })
   @GetMapping
-  public ResponseEntity<?> getBookmark() {
+  public ResponseEntity<?> getBookmark(@AuthenticationPrincipal Long userId) {
+    System.out.println("debug >>>> before getBookmark userId : "+ userId );
+    bookmarkService.getBookmark(userId);  
+    
     return null;
   }
 
@@ -53,7 +62,9 @@ public class BookmarkController {
     @ApiResponse(responseCode = "404", description = "북마크 삭제 실패(해당 글을 북마크에서 찾을 수 없음)")
   })
   @DeleteMapping("/{postId}")
-  public ResponseEntity<?> deleteBookmark(@PathVariable("postId") Long postId) {
+  public ResponseEntity<?> deleteBookmark(@AuthenticationPrincipal Long userId,@PathVariable("postId") Long postId) {
+    System.out.println("debug >>>> before deleteBookmark userId : "+ userId + "postId"+ postId);
+    bookmarkService.deleteBookmark(userId,postId);
     return null;
   }
 }
