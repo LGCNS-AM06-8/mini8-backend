@@ -24,7 +24,7 @@ public class BookmarkResponseDTO {
     private String title;
     private String companyName;
     private List<String> categories;
-    private LocalDateTime publishedAt;
+    private LocalDate publishedAt;
     private OffsetDateTime savedAt;
     private Boolean hasGuide;
 }

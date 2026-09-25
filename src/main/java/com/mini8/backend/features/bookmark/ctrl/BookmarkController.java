@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,6 +43,7 @@ public class BookmarkController {
     return null;
   }
 
+ 
   // getBookmark: 북마크 조회
   @Operation(summary = "북마크 조회", description = "북마크에 저장된 글을 조회함")
   @ApiResponses({
@@ -49,11 +53,13 @@ public class BookmarkController {
   @GetMapping
   public ResponseEntity<?> getBookmark(@AuthenticationPrincipal Long userId) {
     System.out.println("debug >>>> before getBookmark userId : "+ userId );
-    bookmarkService.getBookmark(userId);  
+    Map<String, Object> result = bookmarkService.getBookmark(userId);  
     
-    return null;
+    return ResponseEntity.ok(result);
   }
 
+
+ 
   // deleteBookmark: 북마크 삭제
   @Operation(summary = "북마크 삭제", description = "글을 북마크에서 제외함")
   @ApiResponses({
@@ -67,4 +73,6 @@ public class BookmarkController {
     bookmarkService.deleteBookmark(userId,postId);
     return null;
   }
+
+ 
 }
