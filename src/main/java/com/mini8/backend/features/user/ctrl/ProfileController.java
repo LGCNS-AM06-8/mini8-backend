@@ -31,8 +31,10 @@ public class ProfileController {
     @ApiResponse(responseCode = "401", description = "프로필 저장 실패(토큰 유효성 확인)")
   })
   @PostMapping
-  public ResponseEntity<?> setProfile(@RequestBody ProfileRequestDTO request) {
-    return null;
+  public ResponseEntity<?> setProfile(
+      @AuthenticationPrincipal Long userId, @RequestBody ProfileRequestDTO request) {
+    ProfileResponseDTO response = profileService.setProfile(userId, request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @Operation(summary = "프로필 조회", description = "마이페이지에 표시할 프로필을 조회")
