@@ -1,11 +1,13 @@
 package com.mini8.backend.features.guide.ctrl;
 
+import com.mini8.backend.features.guide.domain.dto.GuideResponseDTO;
 import com.mini8.backend.features.guide.service.GuideService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +29,11 @@ public class GuideController {
     @ApiResponse(responseCode = "404", description = "가이드 생성 실패(유효하지 않은 postId)"),
     @ApiResponse(responseCode = "502", description = "가이드 생성 실패(LLM 서비스 호출 실패)")
   })
+
+  //S11 
   @PostMapping("/{id}/guide")
-  public ResponseEntity<?> generateGuide(@PathVariable("id") int id) {
-    return null;
+  public ResponseEntity<GuideResponseDTO> generateGuide(
+      @PathVariable("id") Long id, @AuthenticationPrincipal Long userId) {
+    return ResponseEntity.ok(guideService.generateGuide(userId, id));
   }
 }

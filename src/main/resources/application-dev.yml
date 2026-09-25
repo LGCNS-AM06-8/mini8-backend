@@ -45,6 +45,6 @@ collect:
   data-dir: ${COLLECT_DATA_DIR:}
   # AI 1차 분류에 쓴 조건. 새 글을 분류할 때도 같아야 결과가 어긋나지 않는다 (C3)
   classify:
-    model: gemini-2.5-flash
+    model: gemini-3.5-flash-lite
     body-chars: 7000
     temperature: 0
