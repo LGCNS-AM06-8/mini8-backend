@@ -43,9 +43,6 @@ public class BlogPostEntity {
   @Column(nullable = false)
   private LocalDateTime published_at;
 
-  @Column(nullable = true, length = 500)
-  private String excerpt;
-
   @Column(columnDefinition = "MEDIUMTEXT", nullable = false)
   private String content_html;
 
