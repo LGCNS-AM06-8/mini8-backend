@@ -43,4 +43,8 @@ public class CompanyEntity {
 
   @Column(nullable = false, length = 20)
   private String feed_type;
+
+  // 기업 로고 이미지 주소(각 회사 공식 이미지). 없으면 null
+  @Column(nullable = true, length = 500)
+  private String logo_url;
 }
