@@ -30,7 +30,7 @@ public class GuideController {
     @ApiResponse(responseCode = "502", description = "가이드 생성 실패(LLM 서비스 호출 실패)")
   })
 
-  //S11 
+  // S11
   @PostMapping("/{id}/guide")
   public ResponseEntity<GuideResponseDTO> generateGuide(
       @PathVariable("id") Long id, @AuthenticationPrincipal Long userId) {
