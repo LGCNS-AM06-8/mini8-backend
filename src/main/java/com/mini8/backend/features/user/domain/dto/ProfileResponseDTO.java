@@ -16,7 +16,7 @@ public class ProfileResponseDTO {
 
   private String name;
 
-  private int userId;
+  private Long userId;
 
   private List<String> jobFields;
 
@@ -28,5 +28,5 @@ public class ProfileResponseDTO {
 
   private int profileVersion;
 
-  public record SkillResponseDTO(int techTagId, String name) {}
+  public record SkillResponseDTO(Long techTagId, String name) {}
 }
