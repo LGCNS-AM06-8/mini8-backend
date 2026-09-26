@@ -4,6 +4,7 @@ import com.mini8.backend.commons.exception.BusinessException;
 import com.mini8.backend.commons.exception.ErrorCode;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
+import com.mini8.backend.database.company.domain.entity.CompanyEntity;
 import com.mini8.backend.database.repository.CompanyRepository;
 import com.mini8.backend.database.repository.UserRepository;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
@@ -12,6 +13,8 @@ import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO.
 import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
 import com.mini8.backend.features.company.repository.CompanyPostQueryRepository;
 import jakarta.transaction.Transactional;
+
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -113,8 +116,25 @@ public class CompanyService {
         new Filter(onlyMySkills, personalized.size(), posts.size()), result);
   }
 
-  public CompanyResponseDTO getCompanyDetail(int id) {
-    return null;
+  public CompanyResponseDTO getCompanyDetail(Long id) {
+
+    Long companyId = id;
+
+    CompanyEntity company = companyRepository.findById(companyId)
+                .orElseThrow(() ->
+                        new BusinessException(ErrorCode.NOT_FOUND));
+
+
+    return CompanyResponseDTO.builder()
+                .companyId(company.getCompany_id())
+                .name(company.getName())
+                .logoUrl(company.getLogo_url())
+                .summary(company.getSummary())
+                .mainBusiness(company.getMain_business())
+                .sourceUrl(company.getSource_url())
+                .checkedAt(LocalDate.now())
+                //.stats(stats)
+                .build();
   }
 
   private Map<Long, List<String>> skills(List<Long> postIds) {
