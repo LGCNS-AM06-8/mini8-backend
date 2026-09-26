@@ -1,10 +1,13 @@
 package com.mini8.backend.features.bookmark.ctrl;
 
+import com.mini8.backend.features.bookmark.domain.dto.BookmarkResponseDTO;
 import com.mini8.backend.features.bookmark.service.BookmarkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,9 +37,9 @@ public class BookmarkController {
       @AuthenticationPrincipal Long userId, @PathVariable("postId") Long postId) {
 
     System.out.println("debug >>>> before addBookmark userId : " + userId + "postId" + postId);
-    // bookmarkService.addBookmark(userId,postId);
+    BookmarkResponseDTO result = bookmarkService.addBookmark(userId, postId);
 
-    return null;
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   // getBookmark: 북마크 조회
@@ -48,9 +51,9 @@ public class BookmarkController {
   @GetMapping
   public ResponseEntity<?> getBookmark(@AuthenticationPrincipal Long userId) {
     System.out.println("debug >>>> before getBookmark userId : " + userId);
-    // bookmarkService.getBookmark(userId);
+    Map<String, Object> result = bookmarkService.getBookmark(userId);
 
-    return null;
+    return ResponseEntity.ok(result);
   }
 
   // deleteBookmark: 북마크 삭제
@@ -64,7 +67,7 @@ public class BookmarkController {
   public ResponseEntity<?> deleteBookmark(
       @AuthenticationPrincipal Long userId, @PathVariable("postId") Long postId) {
     System.out.println("debug >>>> before deleteBookmark userId : " + userId + "postId" + postId);
-    // bookmarkService.deleteBookmark(userId,postId);
-    return null;
+    bookmarkService.deleteBookmark(userId, postId);
+    return ResponseEntity.noContent().build();
   }
 }
