@@ -21,4 +21,6 @@ public class CompanyResponseDTO {
     private String mainBusiness;
     private String sourceUrl;
     private LocalDate checkedAt;
+
+    private CompanyStatsDTO stats;
 }
