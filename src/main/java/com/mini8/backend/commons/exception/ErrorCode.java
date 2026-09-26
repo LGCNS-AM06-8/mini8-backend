@@ -18,7 +18,8 @@ public enum ErrorCode {
   ALREADY_BOOKMARKED(HttpStatus.CONFLICT, "이미 북마크한 게시글입니다."),
   AI_UNAVAILABLE(HttpStatus.BAD_GATEWAY, "AI 서비스를 사용할 수 없습니다."),
   NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED, "아직 구현되지 않은 기능입니다."),
-  INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.");
+  INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
+  PROFILE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 프로필입니다.");
 
   private final HttpStatus status;
   private final String message;

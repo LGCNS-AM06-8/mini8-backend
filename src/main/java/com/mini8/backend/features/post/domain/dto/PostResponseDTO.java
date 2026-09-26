@@ -1,12 +1,21 @@
 package com.mini8.backend.features.post.domain.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
+import java.util.List;
 
-@Builder
-@Getter
-@ToString
-@NoArgsConstructor
-public class PostResponseDTO {}
+public record PostResponseDTO(
+    Long postId,
+    String title,
+    @JsonFormat(pattern = "yyyy-MM-dd") LocalDate publishedAt,
+    String companyName,
+    List<String> categories,
+    List<String> skills,
+    int charCount,
+    String originalUrl,
+    String contentHtml,
+    List<Section> sections,
+    boolean bookmarked) {
+
+  public record Section(int seq, String heading, int charCount) {}
+}
