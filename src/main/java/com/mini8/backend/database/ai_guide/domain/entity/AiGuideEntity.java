@@ -49,10 +49,11 @@ public class AiGuideEntity {
   @Column(nullable = false, length = 20)
   private String prompt_version;
 
-  @Column(length = 100, nullable = true)
+  // JSON 배열로 저장한다. 구간이 10개를 넘으면 255자를 넘어가므로 길이 제한 없는 TEXT 로 둔다
+  @Column(nullable = true, columnDefinition = "TEXT")
   private String focus_sections;
 
-  @Column(length = 255, nullable = true)
+  @Column(nullable = true, columnDefinition = "TEXT")
   private String section_badges;
 
   @Column(nullable = false, columnDefinition = "TEXT")
