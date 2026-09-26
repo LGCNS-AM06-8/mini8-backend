@@ -1,13 +1,13 @@
 package com.mini8.backend.features.bookmark.ctrl;
 
+import com.mini8.backend.features.bookmark.domain.dto.BookmarkResponseDTO;
 import com.mini8.backend.features.bookmark.service.BookmarkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Map;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,17 +33,15 @@ public class BookmarkController {
     @ApiResponse(responseCode = "409", description = "북마크 추가 실패(이미 존재하는 글)")
   })
   @PostMapping("/{postId}")
-  public ResponseEntity<?> addBookmark(@AuthenticationPrincipal Long userId,@PathVariable("postId") Long postId) {
+  public ResponseEntity<?> addBookmark(
+      @AuthenticationPrincipal Long userId, @PathVariable("postId") Long postId) {
 
-    System.out.println("debug >>>> before addBookmark userId : "+ userId + "postId"+ postId);
-    bookmarkService.addBookmark(userId,postId);  
+    System.out.println("debug >>>> before addBookmark userId : " + userId + "postId" + postId);
+    BookmarkResponseDTO result = bookmarkService.addBookmark(userId, postId);
 
-
-
-    return null;
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
- 
   // getBookmark: 북마크 조회
   @Operation(summary = "북마크 조회", description = "북마크에 저장된 글을 조회함")
   @ApiResponses({
@@ -52,14 +50,12 @@ public class BookmarkController {
   })
   @GetMapping
   public ResponseEntity<?> getBookmark(@AuthenticationPrincipal Long userId) {
-    System.out.println("debug >>>> before getBookmark userId : "+ userId );
-    Map<String, Object> result = bookmarkService.getBookmark(userId);  
-    
+    System.out.println("debug >>>> before getBookmark userId : " + userId);
+    Map<String, Object> result = bookmarkService.getBookmark(userId);
+
     return ResponseEntity.ok(result);
   }
 
-
- 
   // deleteBookmark: 북마크 삭제
   @Operation(summary = "북마크 삭제", description = "글을 북마크에서 제외함")
   @ApiResponses({
@@ -68,11 +64,10 @@ public class BookmarkController {
     @ApiResponse(responseCode = "404", description = "북마크 삭제 실패(해당 글을 북마크에서 찾을 수 없음)")
   })
   @DeleteMapping("/{postId}")
-  public ResponseEntity<?> deleteBookmark(@AuthenticationPrincipal Long userId,@PathVariable("postId") Long postId) {
-    System.out.println("debug >>>> before deleteBookmark userId : "+ userId + "postId"+ postId);
-    bookmarkService.deleteBookmark(userId,postId);
-    return null;
+  public ResponseEntity<?> deleteBookmark(
+      @AuthenticationPrincipal Long userId, @PathVariable("postId") Long postId) {
+    System.out.println("debug >>>> before deleteBookmark userId : " + userId + "postId" + postId);
+    bookmarkService.deleteBookmark(userId, postId);
+    return ResponseEntity.noContent().build();
   }
-
- 
 }
