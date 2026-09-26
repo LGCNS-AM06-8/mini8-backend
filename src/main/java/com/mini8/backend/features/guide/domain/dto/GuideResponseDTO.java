@@ -1,12 +1,18 @@
 package com.mini8.backend.features.guide.domain.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import java.util.List;
 
-@Builder
-@Getter
-@ToString
-@NoArgsConstructor
-public class GuideResponseDTO {}
+public record GuideResponseDTO(
+    Long guideId,
+    boolean cached,
+    Basis basis,
+    List<Integer> focusSections,
+    List<SectionBadge> sectionBadges,
+    String section1Text,
+    String section2Text,
+    String section3Text) {
+
+  public record Basis(Integer careerYears, List<String> haveSkills, List<String> wantSkills) {}
+
+  public record SectionBadge(int seq, String badge) {}
+}
