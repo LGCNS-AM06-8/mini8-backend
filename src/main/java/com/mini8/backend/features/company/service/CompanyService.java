@@ -5,10 +5,10 @@ import com.mini8.backend.commons.exception.ErrorCode;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
 import com.mini8.backend.database.company.domain.entity.CompanyEntity;
+import com.mini8.backend.database.repository.BlogPostCategoryRepository;
 import com.mini8.backend.database.repository.BlogPostRepository;
 import com.mini8.backend.database.repository.CompanyRepository;
 import com.mini8.backend.database.repository.UserRepository;
-import com.mini8.backend.database.repository.BlogPostCategoryRepository;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO.Filter;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO.Post;
@@ -16,11 +16,7 @@ import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyStatsDTO;
 import com.mini8.backend.features.company.repository.CompanyPostQueryRepository;
 import jakarta.transaction.Transactional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +39,7 @@ public class CompanyService {
   private final CompanyPostQueryRepository companyPostQueryRepository;
   private final BlogPostRepository blogPostRepository;
   private final BlogPostCategoryRepository blogPostCategoryRepository;
+
   public CompanyResponseDTO getCompanyList() {
     return null;
   }
@@ -127,81 +125,89 @@ public class CompanyService {
   public CompanyResponseDTO getCompanyDetail(Long id) {
 
     Long companyId = id;
-   
-    CompanyEntity company = companyRepository.findById(companyId)
-                .orElseThrow(() ->
-                        new BusinessException(ErrorCode.NOT_FOUND));
+
+    CompanyEntity company =
+        companyRepository
+            .findById(companyId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
     // 해당 companty_id 에 post 수 구하는 코드
-    long postCount =blogPostRepository.countByCompanyId(id);
+    List<BlogPostEntity> eligiblePosts = companyPostQueryRepository.findEligiblePosts(companyId);
+
+    long postCount = eligiblePosts.size();
     // 해당 companty_id 에 최신 글 날짜 쿠하는 코드
-    LocalDateTime firstPublishedAt =blogPostRepository.findFirstPublishedAt(id);
+    LocalDate firstPublishedAt =
+        eligiblePosts.isEmpty()
+            ? null
+            : eligiblePosts.get(eligiblePosts.size() - 1).getPublished_at().toLocalDate();
 
     // 해당 companty_id 에 오래된 글 날짜 쿠하는 코드
-    LocalDateTime lastPublishedAt =blogPostRepository.findLastPublishedAt(id);
-    // 카테고리 상위 5개 추출하는 코드
-    List<Map<String, Object>> topCategories =
-        blogPostCategoryRepository.findTopCategories(id)
-                .stream()
-                .limit(5)
-                .map(row -> Map.of(
-                        "name", row[0],
-                        "count", ((Number) row[1]).intValue()
-                ))
-                .toList();
-    // 기술 태그 상위 5개 가져오는 코드 
-    List<BlogPostEntity> eligiblePosts =
-        companyPostQueryRepository.findEligiblePosts(companyId);
+    LocalDate lastPublishedAt =
+        eligiblePosts.isEmpty() ? null : eligiblePosts.get(0).getPublished_at().toLocalDate();
 
-    List<Long> postIds = eligiblePosts.stream()
-            .map(BlogPostEntity::getBlog_post_id)
-            .toList();
+    List<Long> postIds = eligiblePosts.stream().map(BlogPostEntity::getBlog_post_id).toList();
+
+    List<Map<String, Object>> topCategories =
+        postIds.isEmpty()
+            ? List.of()
+            : blogPostCategoryRepository.findTopCategories(postIds).stream()
+                .limit(5)
+                .map(
+                    row -> {
+                      Map<String, Object> map = new HashMap<>();
+                      map.put("name", row[0]);
+                      map.put("count", ((Number) row[1]).intValue());
+                      return map;
+                    })
+                .toList();
+    // 기술 태그 상위 5개 가져오는 코드
 
     List<Map<String, Object>> topSkills =
-            companyPostQueryRepository.findTags(postIds).stream()
-                    .map(tag -> tag.getTechTag().getName())
-                    .collect(Collectors.groupingBy(
-                            Function.identity(),
-                            Collectors.counting()
-                    ))
-                    .entrySet().stream()
-                    .sorted(
-                            Map.Entry.<String, Long>comparingByValue()
-                                    .reversed()
-                    )
-                    .limit(5)
-                    .map(entry -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("name", entry.getKey());
-                    map.put("count", entry.getValue().intValue());
-                    return map;
+        companyPostQueryRepository.findTags(postIds).stream()
+            .map(tag -> tag.getTechTag().getName())
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+            .limit(5)
+            .map(
+                entry -> {
+                  Map<String, Object> map = new HashMap<>();
+                  map.put("name", entry.getKey());
+                  map.put("count", entry.getValue().intValue());
+                  return map;
                 })
-                    .toList();
+            .toList();
 
+    CompanyStatsDTO stats =
+        CompanyStatsDTO.builder()
+            .postCount((int) postCount)
+            .firstPublishedAt(
+                eligiblePosts.isEmpty()
+                    ? null
+                    : eligiblePosts.get(eligiblePosts.size() - 1).getPublished_at().toLocalDate())
+            .lastPublishedAt(
+                eligiblePosts.isEmpty()
+                    ? null
+                    : eligiblePosts.get(0).getPublished_at().toLocalDate())
+            .topCategories(topCategories)
+            .topSkills(topSkills)
+            .build();
 
-    CompanyStatsDTO stats = CompanyStatsDTO.builder()
-        .postCount((int) postCount)
-        .firstPublishedAt(firstPublishedAt != null? firstPublishedAt.toLocalDate(): null)
-        .lastPublishedAt(lastPublishedAt != null? lastPublishedAt.toLocalDate(): null)
-        .topCategories(topCategories)
-        .topSkills(topSkills)
-        .build();
-
-
-    List<Object[]> categoryResults = blogPostCategoryRepository.findTopCategories(id);
-    for (Object[] row : categoryResults) {
-   // System.out.println("category = " + row[0] +", count = " + row[1]);
-    }
+    //     List<Object[]> categoryResults = blogPostCategoryRepository.findTopCategories(id);
+    //     for (Object[] row : categoryResults) {
+    //    // System.out.println("category = " + row[0] +", count = " + row[1]);
+    //     }
     return CompanyResponseDTO.builder()
-                .companyId(company.getCompany_id())
-                .name(company.getName())
-                .logoUrl(company.getLogo_url())
-                .summary(company.getSummary())
-                .mainBusiness(company.getMain_business())
-                .sourceUrl(company.getSource_url())
-                .checkedAt(LocalDate.now())
-                .stats(stats)
-                .build();
+        .companyId(company.getCompany_id())
+        .name(company.getName())
+        .logoUrl(company.getLogo_url())
+        .summary(company.getSummary())
+        .mainBusiness(company.getMain_business())
+        .sourceUrl(company.getSource_url())
+        .checkedAt(company.getChecked_at() != null ? company.getChecked_at().toLocalDate() : null)
+        .stats(stats)
+        .build();
   }
 
   private Map<Long, List<String>> skills(List<Long> postIds) {

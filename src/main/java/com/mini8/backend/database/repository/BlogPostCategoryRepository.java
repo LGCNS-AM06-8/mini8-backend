@@ -18,16 +18,13 @@ public interface BlogPostCategoryRepository
     """)
   List<BlogPostCategoryEntity> findCategoriesByPostId(@Param("postId") Long postId);
 
-
-
-  @Query("""
-      SELECT c.id.name, COUNT(c)
-      FROM BlogPostCategoryEntity c
-      WHERE c.blogPost.company.company_id = :companyId
-      GROUP BY c.id.name
-      ORDER BY COUNT(c) DESC
+  @Query(
+      """
+    SELECT c.id.name, COUNT(c)
+    FROM BlogPostCategoryEntity c
+    WHERE c.blogPost.blog_post_id IN :postIds
+    GROUP BY c.id.name
+    ORDER BY COUNT(c) DESC
   """)
-  List<Object[]> findTopCategories(
-          @Param("companyId") Long companyId
-  );
+  List<Object[]> findTopCategories(@Param("postIds") List<Long> postIds);
 }
