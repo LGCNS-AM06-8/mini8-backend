@@ -3,7 +3,9 @@ package com.mini8.backend.features.collect.service;
 import com.mini8.backend.features.collect.domain.BlogSource;
 import com.mini8.backend.features.collect.domain.SourceType;
 import com.mini8.backend.features.collect.domain.dto.CollectedPost;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
@@ -16,8 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class FeedListReader implements SourceReader {
 
-  /** 한 번에 볼 글 수. 피드가 최신순이라 앞에서 자른다. 초기 전량 적재는 파이썬이 따로 한다. */
-  private static final int MAX_ARTICLES = 20;
+  /** 한 번에 열어 볼 페이지 안전 상한. 보통은 받을 범위보다 오래된 글이 나오는 곳에서 먼저 멈춘다. */
+  private static final int MAX_ARTICLES = 300;
 
   private final XmlFetcher fetcher;
   private final ArticlePageReader pageReader;
@@ -35,11 +37,21 @@ public class FeedListReader implements SourceReader {
   @Override
   public List<CollectedPost> read(BlogSource source) throws Exception {
     Document feed = fetcher.fetch(source.url());
-    return feed.select("item > link").stream()
-        .map(Element::text)
-        .limit(MAX_ARTICLES)
-        .map(url -> pageReader.read(source.company(), url))
-        .flatMap(java.util.Optional::stream)
-        .toList();
+    List<String> urls =
+        feed.select("item > link").stream().map(Element::text).limit(MAX_ARTICLES).toList();
+
+    // 피드가 최신순이라 범위 밖 글이 하나 나오면 뒤는 열지 않는다
+    List<CollectedPost> posts = new ArrayList<>();
+    for (String url : urls) {
+      Optional<CollectedPost> post = pageReader.read(source.company(), url);
+      if (post.isEmpty()) {
+        continue;
+      }
+      if (!source.covers(post.get().publishedAt())) {
+        break;
+      }
+      posts.add(post.get());
+    }
+    return posts;
   }
 }

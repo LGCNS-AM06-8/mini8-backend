@@ -25,8 +25,8 @@ public class NaverD2Reader implements SourceReader {
   private static final ZoneId KST = ZoneId.of("Asia/Seoul");
   private static final String DOMAIN = "https://d2.naver.com";
 
-  /** 목록 쪽 상한. 쪽당 10편이라 30편을 본다. 초기 776편 적재는 파이썬이 따로 한다. */
-  private static final int MAX_PAGES = 3;
+  /** 목록 쪽 안전 상한. 보통은 받을 범위보다 오래된 글이 나오는 곳에서 먼저 멈춘다. 쪽당 10편. */
+  private static final int MAX_PAGES = 30;
 
   private static final int PAGE_SIZE = 10;
 
@@ -54,7 +54,16 @@ public class NaverD2Reader implements SourceReader {
         break;
       }
       for (JsonNode item : content) {
-        toPost(source.company(), item.path("url").asText()).ifPresent(posts::add);
+        java.util.Optional<CollectedPost> post =
+            toPost(source.company(), item.path("url").asText());
+        if (post.isEmpty()) {
+          continue;
+        }
+        // 목록이 최신 순이라 범위 밖 글이 하나 나오면 뒤는 볼 필요가 없다
+        if (!source.covers(post.get().publishedAt())) {
+          return posts;
+        }
+        posts.add(post.get());
       }
     }
     return posts;

@@ -1,7 +1,9 @@
 package com.mini8.backend.features.collect.service;
 
 import com.mini8.backend.features.collect.domain.dto.TechDictionary;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,8 +55,44 @@ public class TechNameResolver {
     return known.contains(name) || EXTRA_ALIASES.containsValue(name) ? name : null;
   }
 
+  /**
+   * 파일 없이 사전을 만든다. 웹 수집에서 쓴다.
+   *
+   * <p>대표 표기는 앞에 오는 이름이 이긴다. 표에 이미 있는 이름 → 화면 선택지 20종 → 이번에 AI 가 뽑은 이름 순이다. 그래서 새로 들어온 글도 기존 태그와 같은
+   * 행에 붙는다.
+   */
+  public static TechDictionary buildDictionary(
+      Collection<String> existing, Collection<String> preferred, List<String> extracted) {
+    Map<String, String> rep = new LinkedHashMap<>();
+    Map<String, Integer> counts = new LinkedHashMap<>();
+    for (Collection<String> names : List.of(existing, preferred, extracted)) {
+      for (String raw : names) {
+        if (raw == null || raw.isBlank()) {
+          continue;
+        }
+        String name = raw.trim().replaceAll("\\s+", " ");
+        String key = normalize(name);
+        if (key.isEmpty()) {
+          continue;
+        }
+        String display = rep.computeIfAbsent(key, k -> name);
+        counts.putIfAbsent(display, 0);
+      }
+    }
+    for (String raw : extracted) {
+      if (raw == null || raw.isBlank()) {
+        continue;
+      }
+      String display = rep.get(normalize(raw.trim().replaceAll("\\s+", " ")));
+      if (display != null) {
+        counts.merge(display, 1, Integer::sum);
+      }
+    }
+    return new TechDictionary(counts, counts, Map.of(), rep, List.of());
+  }
+
   /** 사전을 만들 때 쓴 것과 같은 정규화. 대소문자·공백·하이픈·밑줄·점·복수형 s 를 없앤다. */
-  private String normalize(String s) {
+  private static String normalize(String s) {
     String k = s.toLowerCase().trim();
     k = k.replaceAll("[\\s\\-_.]+", "");
     k = k.replaceAll("s$", "");
