@@ -1,5 +1,7 @@
 package com.mini8.backend.features.company.domain.dto;
 
+import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,4 +11,15 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
-public class CompanyResponseDTO {}
+@AllArgsConstructor
+public class CompanyResponseDTO {
+  private Long companyId;
+  private String name;
+  private String logoUrl;
+  private String summary;
+  private String mainBusiness;
+  private String sourceUrl;
+  private LocalDate checkedAt;
+
+  private CompanyStatsDTO stats;
+}

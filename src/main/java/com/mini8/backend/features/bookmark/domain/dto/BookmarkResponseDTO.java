@@ -1,5 +1,10 @@
 package com.mini8.backend.features.bookmark.domain.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,4 +14,18 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
-public class BookmarkResponseDTO {}
+@AllArgsConstructor
+public class BookmarkResponseDTO {
+
+  private Long bookmarkId;
+  private Long postId;
+  private Long companyId;
+  private String title;
+  private String companyName;
+  private List<String> categories;
+  private LocalDate publishedAt;
+  private OffsetDateTime savedAt;
+  private Boolean hasGuide;
+
+  private LocalDateTime createdAt;
+}

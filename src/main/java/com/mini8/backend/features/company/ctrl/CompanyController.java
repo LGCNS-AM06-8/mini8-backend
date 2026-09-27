@@ -1,6 +1,7 @@
 package com.mini8.backend.features.company.ctrl;
 
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
+import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
 import com.mini8.backend.features.company.service.CompanyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,7 +57,9 @@ public class CompanyController {
     @ApiResponse(responseCode = "404", description = "기업 상세 정보 조회 실패(유효하지 않은 companyId)")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<?> getCompanyDetail(@PathVariable("id") int id) {
-    return null;
+  public ResponseEntity<?> getCompanyDetail(@PathVariable("id") Long id) {
+    CompanyResponseDTO result = companyService.getCompanyDetail(id);
+
+    return ResponseEntity.ok(result);
   }
 }
