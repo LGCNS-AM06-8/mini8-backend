@@ -60,6 +60,9 @@ public class SecurityConfig {
             auth ->
                 auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
                     .permitAll()
+                    // 로그아웃만 access 토큰이 필요하다 (API 명세). /api/auth/** 보다 먼저 적어야 걸린다
+                    .requestMatchers(HttpMethod.POST, "/api/auth/logout")
+                    .authenticated()
                     .requestMatchers("/api/auth/**")
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/tech-tags")

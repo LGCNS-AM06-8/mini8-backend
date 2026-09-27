@@ -28,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private static final String ACCESS_TYPE = "access";
   private static final String USER_ROLE = "USER";
   private static final String ADMIN_ROLE = "ADMIN";
+  private static final String REFRESH_PATH = "/api/auth/refresh";
 
   private final JwtProvider jwtProvider;
   private final ObjectMapper objectMapper;
@@ -35,6 +36,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   public JwtAuthenticationFilter(JwtProvider jwtProvider, ObjectMapper objectMapper) {
     this.jwtProvider = jwtProvider;
     this.objectMapper = objectMapper;
+  }
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    // 재발급은 access 토큰이 만료된 뒤 부르므로, 만료된 Authorization 헤더가 붙어 와도 막지 않는다
+    return (request.getContextPath() + REFRESH_PATH).equals(request.getRequestURI());
   }
 
   @Override
