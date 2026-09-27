@@ -1,5 +1,6 @@
 package com.mini8.backend.features.company.ctrl;
 
+import com.mini8.backend.features.company.domain.dto.CompanyListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
 import com.mini8.backend.features.company.service.CompanyService;
@@ -33,7 +34,7 @@ public class CompanyController {
   })
   @GetMapping
   public ResponseEntity<?> getCompanyList(@AuthenticationPrincipal Long userId) {
-    CompanyResponseDTO response = companyService.getCompanyList(userId);
+    CompanyListResponseDTO response = companyService.getCompanyList(userId);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
@@ -59,7 +60,9 @@ public class CompanyController {
     @ApiResponse(responseCode = "404", description = "기업 상세 정보 조회 실패(유효하지 않은 companyId)")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<?> getCompanyDetail(@PathVariable("id") int id) {
-    return null;
+  public ResponseEntity<?> getCompanyDetail(@PathVariable("id") Long id) {
+    CompanyResponseDTO result = companyService.getCompanyDetail(id);
+
+    return ResponseEntity.ok(result);
   }
 }

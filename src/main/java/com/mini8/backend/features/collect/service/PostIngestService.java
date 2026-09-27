@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -70,7 +71,11 @@ public class PostIngestService {
           new String[] {"올리브영", "https://oliveyoung.tech/rss.xml", "FEED_FULL"},
           new String[] {"인프랩", "https://tech.inflab.com/rss.xml", "FEED_FULL"},
           new String[] {"SK플래닛", "https://techtopic.skplanet.com/rss.xml", "FEED_FULL"},
-          new String[] {"토스", "https://toss.tech/rss.xml", "FEED_FULL"},
+          new String[] {
+            "토스",
+            "https://api-public.toss.im/api-public/v3/ipd-thor/api/v1/workspaces/15/posts",
+            "JSON_LIST_PAGE"
+          },
           new String[] {"우아한형제들", "https://techblog.woowahan.com/feed/", "FEED_PAGED"},
           new String[] {"컬리", "https://helloworld.kurly.com/rss.xml", "FEED_LIST"},
           new String[] {"네이버 D2", "https://d2.naver.com/api/v1/contents", "JSON_API"},
@@ -146,6 +151,17 @@ public class PostIngestService {
             companyByName.size(), tagByName.size(), newPosts, skipped, sectionCount, tagCount);
     log.info("적재 완료 {}", result);
     return result;
+  }
+
+  /** 화면에서 고를 수 있는 기술 20종 이름. 웹 수집이 사전을 만들 때 대표 표기로 쓴다. */
+  public static Set<String> selectableNames() {
+    return Collections.unmodifiableSet(SELECTABLE.keySet());
+  }
+
+  /** 기업 8곳을 표에 준비한다. 웹 수집은 이 행의 수집 주소를 읽어 돈다. */
+  @Transactional
+  public Map<String, CompanyEntity> ensureCompanies() {
+    return saveCompanies();
   }
 
   /** 기업 8곳. 이름이 같은 행이 있으면 그대로 쓴다. */

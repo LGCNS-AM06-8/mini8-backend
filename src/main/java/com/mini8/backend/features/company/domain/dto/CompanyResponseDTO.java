@@ -1,6 +1,6 @@
 package com.mini8.backend.features.company.domain.dto;
 
-import java.util.List;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,20 +13,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyResponseDTO {
+  private Long companyId;
+  private String name;
+  private String logoUrl;
+  private String summary;
+  private String mainBusiness;
+  private String sourceUrl;
+  private LocalDate checkedAt;
 
-  private List<CompanyDTO> companies;
-
-  public record CompanyDTO(
-      Long companyId,
-      String name,
-      String summary,
-      String logoUrl,
-      Integer matchedSkillCount,
-      Integer totalSkillCount,
-      Integer matchedPostCount,
-      Integer totalPostCount,
-      List<SkillResponseDTO> matchedSkills,
-      boolean recommended) {}
-
-  public record SkillResponseDTO(String name, Integer postCount) {}
+  private CompanyStatsDTO stats;
 }

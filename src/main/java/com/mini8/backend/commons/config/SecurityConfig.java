@@ -54,8 +54,12 @@ public class SecurityConfig {
         .formLogin(f -> f.disable())
         .exceptionHandling(
             exceptions ->
-                exceptions.authenticationEntryPoint(
-                    (request, response, exception) -> writeUnauthorized(response)))
+                exceptions
+                    .authenticationEntryPoint(
+                        (request, response, exception) -> writeUnauthorized(response))
+                    // 로그인은 했지만 권한이 모자란 경우. 이게 없으면 403 이 /error 로 넘어가 401 로 바뀐다
+                    .accessDeniedHandler(
+                        (request, response, exception) -> writeForbidden(response)))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
@@ -103,12 +107,21 @@ public class SecurityConfig {
   }
 
   private void writeUnauthorized(HttpServletResponse response) throws IOException {
+    writeError(response, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "인증이 필요합니다.");
+  }
+
+  private void writeForbidden(HttpServletResponse response) throws IOException {
+    writeError(response, HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN", "접근 권한이 없습니다.");
+  }
+
+  private void writeError(HttpServletResponse response, int status, String code, String message)
+      throws IOException {
     ObjectNode body = objectMapper.createObjectNode();
-    body.put("code", "UNAUTHORIZED");
-    body.put("message", "인증이 필요합니다.");
+    body.put("code", code);
+    body.put("message", message);
     body.putNull("field");
 
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setStatus(status);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setCharacterEncoding(StandardCharsets.UTF_8.name());
     objectMapper.writeValue(response.getWriter(), body);
