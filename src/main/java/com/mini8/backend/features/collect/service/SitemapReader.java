@@ -3,6 +3,8 @@ package com.mini8.backend.features.collect.service;
 import com.mini8.backend.features.collect.domain.BlogSource;
 import com.mini8.backend.features.collect.domain.SourceType;
 import com.mini8.backend.features.collect.domain.dto.CollectedPost;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.jsoup.nodes.Document;
@@ -17,8 +19,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SitemapReader implements SourceReader {
 
-  /** 한 번에 볼 글 수. 사이트맵이 오래된 순이라 뒤에서 자른다. 초기 전량 적재는 파이썬이 따로 한다. */
-  private static final int MAX_ARTICLES = 20;
+  /** 한 번에 열어 볼 페이지 안전 상한. 보통은 받을 범위보다 오래된 글이 나오는 곳에서 먼저 멈춘다. */
+  private static final int MAX_ARTICLES = 300;
 
   private final XmlFetcher fetcher;
   private final ArticlePageReader pageReader;
@@ -36,12 +38,22 @@ public class SitemapReader implements SourceReader {
   @Override
   public List<CollectedPost> read(BlogSource source) throws Exception {
     Document sitemap = fetcher.fetch(source.url());
-    List<String> urls = articleUrls(sitemap);
-    List<String> recent = urls.subList(Math.max(0, urls.size() - MAX_ARTICLES), urls.size());
-    return recent.stream()
-        .map(url -> pageReader.read(source.company(), url))
-        .flatMap(Optional::stream)
-        .toList();
+    List<String> urls = new ArrayList<>(articleUrls(sitemap));
+    // 사이트맵이 오래된 순이라 뒤집어 최신 글부터 연다
+    Collections.reverse(urls);
+
+    List<CollectedPost> posts = new ArrayList<>();
+    for (String url : urls.subList(0, Math.min(urls.size(), MAX_ARTICLES))) {
+      Optional<CollectedPost> post = pageReader.read(source.company(), url);
+      if (post.isEmpty()) {
+        continue;
+      }
+      if (!source.covers(post.get().publishedAt())) {
+        break;
+      }
+      posts.add(post.get());
+    }
+    return posts;
   }
 
   /** 한국어 글만 남긴다. 태그 목록과 쪽 나눔은 글이 아니다. */
