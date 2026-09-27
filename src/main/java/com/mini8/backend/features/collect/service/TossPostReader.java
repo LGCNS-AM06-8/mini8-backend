@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 /**
  * 토스. 피드가 최근 20편만 줘서 12개월치를 받으려면 목록 API 를 써야 한다.
  *
+ * <p>카테고리를 가리지 않고 다 받는다(Engineering · Design). 다른 기업처럼 기술 글인지는 AI 분류가 가른다.
+ *
  * <p>목록 API 는 제목 · 주소 조각(key) · 발행 시각 · 분류를 주고 본문은 소제목 없는 평문만 준다. 구간을 나누려면 소제목이 있어야 해서 본문은 글
  * 페이지(`/article/{key}`)에서 읽는다. 글 페이지에는 발행 시각 메타가 없어 시각은 목록 값을 쓴다.
  */
@@ -29,9 +31,6 @@ public class TossPostReader implements SourceReader {
 
   /** 목록 쪽 안전 상한. 보통은 한 쪽이 통째로 범위 밖이 되는 곳에서 먼저 멈춘다. */
   private static final int MAX_PAGES = 30;
-
-  /** 모든 글에 붙는 목록 분류. 글을 가르는 값이 아니라서 카테고리로 넣지 않는다. */
-  private static final String LIST_CATEGORY = "Engineering";
 
   private final NaverD2Reader.JsonFetcher jsonFetcher;
   private final PageFetcher pageFetcher;
@@ -70,7 +69,7 @@ public class TossPostReader implements SourceReader {
   List<Listing> listings(BlogSource source) throws Exception {
     List<Listing> inWindow = new ArrayList<>();
     for (int page = 1; page <= MAX_PAGES; page++) {
-      JsonNode body = jsonFetcher.fetch(source.url() + "&page=" + page + "&size=" + PAGE_SIZE);
+      JsonNode body = jsonFetcher.fetch(source.url() + "?page=" + page + "&size=" + PAGE_SIZE);
       JsonNode data = body.path("success");
       JsonNode results = data.path("results");
       if (!results.isArray() || results.isEmpty()) {
@@ -100,7 +99,7 @@ public class TossPostReader implements SourceReader {
     List<String> categories = new ArrayList<>();
     for (JsonNode category : item.path("categories")) {
       String name = category.path("name").asText("");
-      if (!name.isBlank() && !LIST_CATEGORY.equals(name)) {
+      if (!name.isBlank()) {
         categories.add(name);
       }
     }

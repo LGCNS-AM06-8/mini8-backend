@@ -73,7 +73,7 @@ public class PostIngestService {
           new String[] {"SK플래닛", "https://techtopic.skplanet.com/rss.xml", "FEED_FULL"},
           new String[] {
             "토스",
-            "https://api-public.toss.im/api-public/v3/ipd-thor/api/v1/workspaces/15/posts?categoriesSlug=engineering",
+            "https://api-public.toss.im/api-public/v3/ipd-thor/api/v1/workspaces/15/posts",
             "JSON_LIST_PAGE"
           },
           new String[] {"우아한형제들", "https://techblog.woowahan.com/feed/", "FEED_PAGED"},
