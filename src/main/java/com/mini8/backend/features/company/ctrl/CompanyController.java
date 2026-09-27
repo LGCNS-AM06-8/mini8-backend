@@ -1,12 +1,14 @@
 package com.mini8.backend.features.company.ctrl;
 
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
+import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
 import com.mini8.backend.features.company.service.CompanyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +32,9 @@ public class CompanyController {
     @ApiResponse(responseCode = "401", description = "기업 목록 불러오기 실패")
   })
   @GetMapping
-  public ResponseEntity<?> getCompanyList() {
-    return null;
+  public ResponseEntity<?> getCompanyList(@AuthenticationPrincipal Long userId) {
+    CompanyResponseDTO response = companyService.getCompanyList(userId);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   // getCompanyPostList: 글 목록 불러오기
