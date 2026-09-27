@@ -26,8 +26,8 @@ public class RssReader implements SourceReader {
 
   private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
-  /** 쪽 넘김 상한. 우아한형제들이 쪽당 10편이라 12개월 55편을 덮는다. 초기 전량 적재는 파이썬이 따로 한다. */
-  private static final int MAX_PAGES = 6;
+  /** 쪽 넘김 안전 상한. 보통은 범위 밖 글이 나오는 쪽에서 먼저 멈춘다(우아한형제들 쪽당 10편). */
+  private static final int MAX_PAGES = 30;
 
   private final XmlFetcher fetcher;
   private final HeadingFinder headingFinder;
@@ -45,23 +45,26 @@ public class RssReader implements SourceReader {
   @Override
   public List<CollectedPost> read(BlogSource source) throws Exception {
     if (source.type() == SourceType.FEED_PAGED) {
-      return readAllPages(source.company(), source.url());
+      return readAllPages(source);
     }
     return readOnePage(source.company(), source.url());
   }
 
-  /** 쪽을 넘기며 읽는다. 새 주소가 하나도 없는 쪽이 나오면 멈춘다. */
-  private List<CollectedPost> readAllPages(String company, String feedUrl) throws Exception {
+  /** 쪽을 넘기며 읽는다. 새 주소가 없는 쪽이나 받을 범위보다 오래된 글이 나온 쪽에서 멈춘다. */
+  private List<CollectedPost> readAllPages(BlogSource source) throws Exception {
     List<CollectedPost> all = new ArrayList<>();
     Set<String> seen = new HashSet<>();
 
     for (int page = 1; page <= MAX_PAGES; page++) {
-      List<CollectedPost> posts = readOnePage(company, pageUrl(feedUrl, page));
+      List<CollectedPost> posts = readOnePage(source.company(), pageUrl(source.url(), page));
       List<CollectedPost> fresh = posts.stream().filter(post -> seen.add(post.url())).toList();
       if (fresh.isEmpty()) {
         break;
       }
       all.addAll(fresh);
+      if (fresh.stream().anyMatch(post -> !source.covers(post.publishedAt()))) {
+        break;
+      }
     }
     return all;
   }
