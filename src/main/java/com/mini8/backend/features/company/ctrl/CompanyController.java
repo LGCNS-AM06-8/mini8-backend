@@ -1,7 +1,7 @@
 package com.mini8.backend.features.company.ctrl;
 
-import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyListResponseDTO;
+import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
 import com.mini8.backend.features.company.service.CompanyService;
 import io.swagger.v3.oas.annotations.Operation;
