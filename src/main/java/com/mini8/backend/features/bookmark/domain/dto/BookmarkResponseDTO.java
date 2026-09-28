@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +29,6 @@ public class BookmarkResponseDTO {
   private LocalDate publishedAt;
   private OffsetDateTime savedAt;
   private Boolean hasGuide;
-
+  @JsonIgnore
   private LocalDateTime createdAt;
 }
