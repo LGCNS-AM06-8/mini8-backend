@@ -1,5 +1,6 @@
 package com.mini8.backend.features.company.ctrl;
 
+import com.mini8.backend.features.company.domain.dto.CompanyListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
 import com.mini8.backend.features.company.service.CompanyService;
@@ -33,7 +34,7 @@ public class CompanyController {
   })
   @GetMapping
   public ResponseEntity<?> getCompanyList(@AuthenticationPrincipal Long userId) {
-    CompanyResponseDTO response = companyService.getCompanyList(userId);
+    CompanyListResponseDTO response = companyService.getCompanyList(userId);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

@@ -7,27 +7,24 @@ import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostTagEntity;
 import com.mini8.backend.database.company.domain.entity.CompanyEntity;
-import com.mini8.backend.database.repository.BlogPostRepository;
-import com.mini8.backend.database.repository.BlogPostTagRepository;
-import com.mini8.backend.database.company.domain.entity.CompanyEntity;
 import com.mini8.backend.database.repository.BlogPostCategoryRepository;
 import com.mini8.backend.database.repository.BlogPostRepository;
+import com.mini8.backend.database.repository.BlogPostTagRepository;
 import com.mini8.backend.database.repository.CompanyRepository;
 import com.mini8.backend.database.repository.UserRepository;
 import com.mini8.backend.database.repository.UserSkillRepository;
+import com.mini8.backend.features.company.domain.dto.CompanyListResponseDTO;
+import com.mini8.backend.features.company.domain.dto.CompanyListResponseDTO.CompanyDTO;
+import com.mini8.backend.features.company.domain.dto.CompanyListResponseDTO.SkillResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO.Filter;
 import com.mini8.backend.features.company.domain.dto.CompanyPostListResponseDTO.Post;
 import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO;
-import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO.CompanyDTO;
-import com.mini8.backend.features.company.domain.dto.CompanyResponseDTO.SkillResponseDTO;
-import com.mini8.backend.features.company.repository.CompanyPostQueryRepository;
-import jakarta.transaction.Transactional;
-import java.util.ArrayList;
 import com.mini8.backend.features.company.domain.dto.CompanyStatsDTO;
 import com.mini8.backend.features.company.repository.CompanyPostQueryRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,22 +48,23 @@ public class CompanyService {
   private final BlogPostRepository blogPostRepository;
   private final BlogPostTagRepository blogPostTagRepository;
   private final CompanyPostQueryRepository companyPostQueryRepository;
-  private final BlogPostRepository blogPostRepository;
   private final BlogPostCategoryRepository blogPostCategoryRepository;
 
   @Transactional
-  public CompanyResponseDTO getCompanyList(Long userId) {
+  public CompanyListResponseDTO getCompanyList(Long userId) {
     UserEntity user =
         userRepository
             .findById(userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
 
+    // 사용자의 관심 기술 ID
     Set<Long> wantSkillIds =
         userSkillRepository.findAllByUserAndSkillType(user, "WANT").stream()
             .map(wantSkill -> wantSkill.getTechTag())
             .map(techTag -> techTag.getTech_tag_id())
             .collect(Collectors.toSet());
 
+    // is_tech == false인 글 제외
     List<BlogPostEntity> techPosts =
         blogPostRepository.findAll().stream()
             .filter(post -> !Boolean.FALSE.equals(post.getIs_tech()))
@@ -75,12 +73,14 @@ public class CompanyService {
     Set<Long> techPostIds =
         techPosts.stream().map(BlogPostEntity::getBlog_post_id).collect(Collectors.toSet());
 
+    // 기업별 전체 글 수 계산
     Map<CompanyEntity, Long> postsByCompany =
         techPosts.stream()
             .collect(Collectors.groupingBy(BlogPostEntity::getCompany, Collectors.counting()));
 
     List<BlogPostTagEntity> blogPostTagEntity = blogPostTagRepository.findAll();
 
+    // 각 기업의 관심 기술별 글 수 계산
     Map<CompanyEntity, Map<TechTagEntity, Integer>> tagsByCompany =
         blogPostTagEntity.stream()
             .filter(tag -> techPostIds.contains(tag.getBlogPost().getBlog_post_id()))
@@ -155,7 +155,7 @@ public class CompanyService {
               true));
     }
 
-    return CompanyResponseDTO.builder().companies(companies).build();
+    return CompanyListResponseDTO.builder().companies(companies).build();
   }
 
   @Transactional
