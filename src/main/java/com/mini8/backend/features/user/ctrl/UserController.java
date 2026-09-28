@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,7 +57,12 @@ public class UserController {
     @ApiResponse(responseCode = "403", description = "token 재발급 실패(refresh token 유효성 확인)")
   })
   @PostMapping("/refresh")
-  public ResponseEntity<?> refreshToken() {
-    return null;
+  public ResponseEntity<?> refreshToken(
+      @RequestHeader(value = "Refresh-Token", required = false) String refreshToken) {
+    String accessToken = userService.refreshToken(refreshToken);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .header("Authorization", "Bearer " + accessToken)
+        .build();
   }
 }

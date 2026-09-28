@@ -1,10 +1,14 @@
 package com.mini8.backend.features.user.service;
 
+import com.mini8.backend.commons.exception.BusinessException;
+import com.mini8.backend.commons.exception.ErrorCode;
 import com.mini8.backend.commons.token.JwtProvider;
+import com.mini8.backend.commons.token.JwtProvider.JwtTokenException;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.repository.UserRepository;
 import com.mini8.backend.features.user.domain.dto.UserResponseDTO;
 import com.mini8.backend.features.user.service.GoogleUserInfoClient.GoogleUserInfo;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final JwtProvider jwtProvider;
 
+  @Transactional
   public LoginResult signIn(String googleAccessToken) {
     GoogleUserInfo info = googleUserInfoClient.getUserInfo(googleAccessToken);
 
@@ -27,7 +32,7 @@ public class UserService {
     String accessToken = jwtProvider.createAccessToken(user.getUser_id(), user.getRole());
     String refreshToken = jwtProvider.createRefreshToken(user.getUser_id());
 
-    // TODO: UserRepository에 refreshToken를 갱신하는 코드 추가하기
+    userRepository.updateRefreshToken(user.getUser_id(), refreshToken);
 
     UserResponseDTO response =
         UserResponseDTO.builder()
@@ -62,7 +67,25 @@ public class UserService {
     return null;
   }
 
-  public UserResponseDTO refreshToken() {
-    return null;
+  @Transactional
+  public String refreshToken(String refreshToken) {
+    if (refreshToken == null || refreshToken.isBlank()) {
+      throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
+    }
+
+    Long userId;
+    try {
+      userId = jwtProvider.parseRefreshToken(refreshToken);
+    } catch (JwtTokenException exception) {
+      throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
+    }
+
+    UserEntity user =
+        userRepository
+            .findById(userId)
+            .filter(found -> refreshToken.equals(found.getRefresh_token()))
+            .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+    return jwtProvider.createAccessToken(user.getUser_id(), user.getRole());
   }
 }

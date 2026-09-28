@@ -90,6 +90,16 @@ public class JwtProvider {
     }
   }
 
+  public Long parseRefreshToken(String token) {
+    ParsedToken parsedToken = parse(token);
+
+    if (!REFRESH_TYPE.equals(parsedToken.type())) {
+      throw JwtTokenException.unauthorized();
+    }
+
+    return parsedToken.userId();
+  }
+
   private void requireUserId(Long userId) {
     if (userId == null) {
       throw new IllegalArgumentException("userId는 필수입니다.");
