@@ -168,8 +168,10 @@ public class CompanyService {
         .filter(Objects::nonNull)
         // 빈 문자열 제외
         .filter(field -> !field.isBlank())
+        // 같은 필드끼리 묶김
         .collect(Collectors.groupingBy(
             Function.identity(),
+            // 필드 수 세기
             Collectors.counting()
         ))
         .entrySet().stream()
