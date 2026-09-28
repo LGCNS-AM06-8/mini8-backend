@@ -158,19 +158,79 @@ public class PostIngestService {
     return Collections.unmodifiableSet(SELECTABLE.keySet());
   }
 
+  /** 기업 소개 4칸과 로고. 기업 상세 화면(04)과 기업 목록(03)에 나간다. */
+  record CompanyIntro(String summary, String mainBusiness, String sourceUrl, String logoUrl) {}
+
+  /** 소개 · 로고를 공식 페이지에서 확인한 날. */
+  private static final LocalDateTime INTRO_CHECKED_AT = LocalDate.of(2026, 9, 28).atStartOfDay();
+
+  /** 기업별 소개. 출처(sourceUrl)는 기술 블로그 주소, 로고는 각 회사 공식 이미지 주소다. */
+  private static final Map<String, CompanyIntro> INTROS =
+      Map.of(
+          "올리브영",
+          new CompanyIntro(
+              "헬스&뷰티 스토어를 운영하는 옴니채널 유통기업",
+              "H&B 스토어 · 온라인몰 · 자체 브랜드 · 글로벌 사업",
+              "https://oliveyoung.tech",
+              "https://oliveyoung.tech/icons/icon-512x512.png"),
+          "인프랩",
+          new CompanyIntro(
+              "IT 실무 교육 플랫폼 인프런을 운영하는 에듀테크 기업",
+              "온라인 강의(인프런) · IT 채용(랠릿)",
+              "https://tech.inflab.com",
+              "https://cdn.inflearn.com/dist/icon-512x512.png"),
+          "SK플래닛",
+          new CompanyIntro(
+              "OK캐쉬백 등을 운영하는 데이터·마케팅 플랫폼 기업",
+              "마케팅 플랫폼(OK캐쉬백·시럽) · 광고·리테일미디어 · 마이데이터",
+              "https://techtopic.skplanet.com",
+              "https://techtopic.skplanet.com/icons/icon-512x512.png"),
+          "토스",
+          new CompanyIntro(
+              "송금·결제·은행·증권을 한 앱에서 제공하는 핀테크 기업",
+              "간편송금·결제 · 토스뱅크 · 토스증권 · 토스페이먼츠 · 토스인슈어런스",
+              "https://toss.tech",
+              "https://static.toss.im/assets/toss-im/asset/favicon/favicon-196x196.png"),
+          "우아한형제들",
+          new CompanyIntro(
+              "배달의민족 앱을 운영하는 푸드테크 기업",
+              "음식 배달 · 퀵커머스(B마트) · B2B 식자재(배민상회) · 로봇배달",
+              "https://techblog.woowahan.com",
+              "https://woowahan-cdn.woowahan.com/favicon/ko/android-chrome-512x512.png"),
+          "컬리",
+          new CompanyIntro(
+              "신선식품을 새벽배송하는 온라인 마켓",
+              "신선식품 새벽배송(샛별배송) · 생산자 직거래 · 풀콜드체인 물류",
+              "https://helloworld.kurly.com",
+              "https://res.kurly.com/images/marketkurly/logo/logo_sns_marketkurly.jpg"),
+          "네이버 D2",
+          new CompanyIntro(
+              "네이버 개발자들이 운영하는 기술 블로그. 네이버는 검색·커머스·AI 서비스 기업",
+              "검색·포털 · 커머스 · 네이버페이 · 클라우드 · AI(하이퍼클로바X)",
+              "https://d2.naver.com",
+              "https://d2.naver.com/favicon.ico"),
+          "LY(라인)",
+          new CompanyIntro(
+              "메신저 LINE과 야후재팬을 운영하는 일본 IT 기업",
+              "메신저(LINE) · 포털(Yahoo! JAPAN) · 광고 · 이커머스",
+              "https://techblog.lycorp.co.jp/ko",
+              "https://www.lycorp.co.jp/assets/images/apple-touch-icon.png"));
+
   /** 기업 8곳을 표에 준비한다. 웹 수집은 이 행의 수집 주소를 읽어 돈다. */
   @Transactional
   public Map<String, CompanyEntity> ensureCompanies() {
     return saveCompanies();
   }
 
-  /** 기업 8곳. 이름이 같은 행이 있으면 그대로 쓴다. */
+  /** 기업 8곳. 이름이 같은 행이 있으면 그대로 쓰고, 소개 · 로고 칸이 비어 있으면 채운다. */
   private Map<String, CompanyEntity> saveCompanies() {
     Map<String, CompanyEntity> byName = new LinkedHashMap<>();
     for (String[] c : COMPANIES) {
+      CompanyIntro intro = INTROS.get(c[0]);
       CompanyEntity entity =
           companies
               .findByName(c[0])
+              .map(found -> fillIntro(found, intro))
               .orElseGet(
                   () ->
                       companies.save(
@@ -178,10 +238,44 @@ public class PostIngestService {
                               .name(c[0])
                               .feed_url(c[1])
                               .feed_type(c[2])
+                              .summary(intro.summary())
+                              .main_business(intro.mainBusiness())
+                              .source_url(intro.sourceUrl())
+                              .checked_at(INTRO_CHECKED_AT)
+                              .logo_url(intro.logoUrl())
                               .build()));
       byName.put(c[0], entity);
     }
     return byName;
+  }
+
+  /** 이미 있는 행의 빈 칸만 채운다. 사람이 고친 값은 덮어쓰지 않는다. */
+  private CompanyEntity fillIntro(CompanyEntity found, CompanyIntro intro) {
+    boolean complete =
+        found.getSummary() != null
+            && found.getMain_business() != null
+            && found.getSource_url() != null
+            && found.getChecked_at() != null
+            && found.getLogo_url() != null;
+    if (complete) {
+      return found;
+    }
+    return companies.save(
+        CompanyEntity.builder()
+            .company_id(found.getCompany_id())
+            .name(found.getName())
+            .feed_url(found.getFeed_url())
+            .feed_type(found.getFeed_type())
+            .summary(orElse(found.getSummary(), intro.summary()))
+            .main_business(orElse(found.getMain_business(), intro.mainBusiness()))
+            .source_url(orElse(found.getSource_url(), intro.sourceUrl()))
+            .checked_at(found.getChecked_at() != null ? found.getChecked_at() : INTRO_CHECKED_AT)
+            .logo_url(orElse(found.getLogo_url(), intro.logoUrl()))
+            .build());
+  }
+
+  private static String orElse(String value, String fallback) {
+    return value != null ? value : fallback;
   }
 
   /** 기술 사전 전부. 20종만 화면에서 고를 수 있게 표시한다. */
