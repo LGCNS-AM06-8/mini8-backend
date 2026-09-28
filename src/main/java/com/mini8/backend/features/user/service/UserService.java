@@ -6,6 +6,7 @@ import com.mini8.backend.commons.token.JwtProvider;
 import com.mini8.backend.commons.token.JwtProvider.JwtTokenException;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.repository.UserRepository;
+import com.mini8.backend.features.user.domain.dto.UserLogoutRequestDTO;
 import com.mini8.backend.features.user.domain.dto.UserResponseDTO;
 import com.mini8.backend.features.user.service.GoogleUserInfoClient.GoogleUserInfo;
 import jakarta.transaction.Transactional;
@@ -63,8 +64,18 @@ public class UserService {
   // 컨트롤러가 응답 바디와 두 토큰 헤더를 한 번에 조립하도록 묶은 내부 결과다.
   public record LoginResult(UserResponseDTO response, String accessToken, String refreshToken) {}
 
-  public UserResponseDTO signOut() {
-    return null;
+  @Transactional
+  public void signOut(Long userId, UserLogoutRequestDTO request) {
+    String refreshToken = request.getRefreshToken();
+
+    userRepository
+        .findById(userId)
+        .filter(user -> refreshToken.equals(user.getRefresh_token()))
+        .ifPresentOrElse(
+            (user) -> userRepository.updateRefreshToken(userId, null),
+            () -> {
+              throw new BusinessException(ErrorCode.UNAUTHORIZED);
+            });
   }
 
   @Transactional

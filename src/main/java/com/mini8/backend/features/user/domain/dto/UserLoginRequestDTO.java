@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRequestDTO {
+public class UserLoginRequestDTO {
 
   // Google userinfo API에서 사용자를 확인할 OAuth 2.0 access token
   @NotBlank private String googleAccessToken;
