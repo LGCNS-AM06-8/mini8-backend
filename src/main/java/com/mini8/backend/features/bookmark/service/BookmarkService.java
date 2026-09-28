@@ -10,6 +10,7 @@ import com.mini8.backend.database.repository.BlogPostRepository;
 import com.mini8.backend.database.repository.UserRepository;
 import com.mini8.backend.features.bookmark.domain.dto.BookmarkResponseDTO;
 import com.mini8.backend.features.bookmark.repository.BookmarkRepository;
+import com.mini8.backend.features.company.repository.CompanyPostQueryRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -27,6 +28,8 @@ public class BookmarkService {
   private final UserRepository userRepository;
   private final BlogPostRepository blogPostRepository;
   private final BlogPostCategoryRepository blogPostCategoryRepository;
+  // findGuidedPostIds 이 존재하는 래포 가져오기
+  private final CompanyPostQueryRepository companyPostQueryRepository;
 
   @Transactional
   public BookmarkResponseDTO addBookmark(Long userId, Long postId) {
@@ -64,6 +67,20 @@ public class BookmarkService {
 
     List<BookmarkEntity> bookmarkEntities = bookmarkRepository.findBookmarksByUser(userId);
 
+    // 북마크 ai가이드 존재여부 판단해서 has값 수정하는 코드
+
+    List<Long> postIds =
+        bookmarkEntities.stream()
+            .map(bookmark -> bookmark.getBlogPost().getBlog_post_id())
+            .toList();
+    // 최신 사용자의 프로필 버전 가져오기
+    Integer profileVersion = userRepository.findById(userId).orElseThrow().getProfile_version();
+    // 현재 프로필 버전으로 만들어진 ai가이드 있는 게시글 ID 조회
+    List<Long> guidedPostIds =
+        postIds.isEmpty()
+            ? List.of()
+            : companyPostQueryRepository.findGuidedPostIds(userId, profileVersion, postIds);
+
     List<BookmarkResponseDTO> bookmarks =
         bookmarkEntities.stream()
             .map(
@@ -89,7 +106,7 @@ public class BookmarkService {
                       .categories(categories)
                       .publishedAt(post.getPublished_at().toLocalDate())
                       .savedAt(savedAt)
-                      .hasGuide(false)
+                      .hasGuide(guidedPostIds.contains(postId))
                       .build();
                 })
             .toList();
