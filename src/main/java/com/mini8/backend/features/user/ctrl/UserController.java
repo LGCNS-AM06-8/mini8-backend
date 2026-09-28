@@ -1,6 +1,6 @@
 package com.mini8.backend.features.user.ctrl;
 
-import com.mini8.backend.features.user.domain.dto.UserRequestDTO;
+import com.mini8.backend.features.user.domain.dto.UserLoginRequestDTO;
 import com.mini8.backend.features.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,7 +29,7 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "로그인 실패(access token으로 Google userinfo 조회 실패)")
   })
   @PostMapping("/google")
-  public ResponseEntity<?> signIn(@RequestBody UserRequestDTO request) {
+  public ResponseEntity<?> signIn(@RequestBody UserLoginRequestDTO request) {
     UserService.LoginResult result = userService.signIn(request.getGoogleAccessToken());
 
     // 우리 서비스에서 사용할 JWT는 바디가 아닌 응답 헤더로 전달한다.
