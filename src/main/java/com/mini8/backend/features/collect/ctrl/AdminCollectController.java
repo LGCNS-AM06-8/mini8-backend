@@ -1,11 +1,14 @@
 package com.mini8.backend.features.collect.ctrl;
 
+import com.mini8.backend.features.collect.service.CollectJobService;
 import com.mini8.backend.features.collect.service.PostImportService;
 import com.mini8.backend.features.collect.service.PostIngestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,9 +24,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminCollectController {
 
   private final PostImportService importService;
+  private final CollectJobService jobService;
 
-  public AdminCollectController(PostImportService importService) {
+  public AdminCollectController(PostImportService importService, CollectJobService jobService) {
     this.importService = importService;
+    this.jobService = jobService;
+  }
+
+  /** 웹 수집 요청 바디. 통째로 생략하면 전체 기업이다. */
+  public record CollectRequest(Long companyId) {}
+
+  @PostMapping
+  @Operation(
+      summary = "웹에서 글 수집",
+      description =
+          "기업 블로그에서 12개월 안 글을 받아 AI 1차 분류를 매기고 표에 넣는다. 오래 걸려서 바로 202 를 돌려주고 뒤에서 돈다. "
+              + "이미 있는 글은 url 로 걸러 AI 를 다시 부르지 않는다. 바디를 생략하면 전체 기업을 받는다. ADMIN 만 부른다.")
+  public ResponseEntity<CollectJobService.Job> collectFromWeb(
+      @RequestBody(required = false) CollectRequest request) {
+    Long companyId = request == null ? null : request.companyId();
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(jobService.start(companyId));
   }
 
   @PostMapping("/import")
