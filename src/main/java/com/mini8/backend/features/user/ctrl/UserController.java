@@ -1,14 +1,17 @@
 package com.mini8.backend.features.user.ctrl;
 
 import com.mini8.backend.features.user.domain.dto.UserLoginRequestDTO;
+import com.mini8.backend.features.user.domain.dto.UserLogoutRequestDTO;
 import com.mini8.backend.features.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -46,8 +49,10 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "로그아웃 실패(토큰 유효성 확인)")
   })
   @PostMapping("/logout")
-  public ResponseEntity<?> signOut() {
-    return null;
+  public ResponseEntity<?> signOut(
+      @AuthenticationPrincipal Long userId, @Valid @RequestBody UserLogoutRequestDTO request) {
+    userService.signOut(userId, request);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   // refreshToken: access token 재발급
