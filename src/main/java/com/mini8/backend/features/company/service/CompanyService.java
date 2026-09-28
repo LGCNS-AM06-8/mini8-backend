@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -261,19 +262,44 @@ public class CompanyService {
 
     List<Long> postIds = eligiblePosts.stream().map(BlogPostEntity::getBlog_post_id).toList();
 
+    // List<Map<String, Object>> topCategories =
+    //     postIds.isEmpty()
+    //         ? List.of()
+    //         : blogPostCategoryRepository.findTopCategories(postIds).stream()
+    //             .limit(5)
+    //             .map(
+    //                 row -> {
+    //                   Map<String, Object> map = new HashMap<>();
+    //                   map.put("name", row[0]);
+    //                   map.put("count", ((Number) row[1]).intValue());
+    //                   return map;
+    //                 })
+    //             .toList();
     List<Map<String, Object>> topCategories =
-        postIds.isEmpty()
-            ? List.of()
-            : blogPostCategoryRepository.findTopCategories(postIds).stream()
-                .limit(5)
-                .map(
-                    row -> {
-                      Map<String, Object> map = new HashMap<>();
-                      map.put("name", row[0]);
-                      map.put("count", ((Number) row[1]).intValue());
-                      return map;
-                    })
-                .toList();
+        eligiblePosts.stream()
+            .map(BlogPostEntity::getField)
+            // 필드값이 null 제외
+            .filter(Objects::nonNull)
+            // 빈 문자열 제외
+            .filter(field -> !field.isBlank())
+            // 같은 필드끼리 묶김
+            .collect(
+                Collectors.groupingBy(
+                    Function.identity(),
+                    // 필드 수 세기
+                    Collectors.counting()))
+            .entrySet()
+            .stream()
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+            .limit(5)
+            .map(
+                entry -> {
+                  Map<String, Object> map = new HashMap<>();
+                  map.put("name", entry.getKey());
+                  map.put("count", entry.getValue().intValue());
+                  return map;
+                })
+            .toList();
     // 기술 태그 상위 5개 가져오는 코드
 
     List<Map<String, Object>> topSkills =
