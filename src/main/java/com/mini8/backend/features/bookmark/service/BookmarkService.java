@@ -15,8 +15,10 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -81,6 +83,18 @@ public class BookmarkService {
             ? List.of()
             : companyPostQueryRepository.findGuidedPostIds(userId, profileVersion, postIds);
 
+    // 글별 기술 칩. 04 글 목록(CompanyService)과 같은 조회라 순서도 같다
+    Map<Long, List<String>> skillsByPost =
+        postIds.isEmpty()
+            ? Map.of()
+            : companyPostQueryRepository.findTags(postIds).stream()
+                .collect(
+                    Collectors.groupingBy(
+                        tag -> tag.getId().getBlog_post_id(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                            tag -> tag.getTechTag().getName(), Collectors.toList())));
+
     List<BookmarkResponseDTO> bookmarks =
         bookmarkEntities.stream()
             .map(
@@ -104,6 +118,8 @@ public class BookmarkService {
                       .title(post.getTitle())
                       .companyName(post.getCompany().getName())
                       .categories(categories)
+                      .summary(post.getSummary())
+                      .skills(skillsByPost.getOrDefault(postId, List.of()))
                       .publishedAt(post.getPublished_at().toLocalDate())
                       .savedAt(savedAt)
                       .hasGuide(guidedPostIds.contains(postId))
