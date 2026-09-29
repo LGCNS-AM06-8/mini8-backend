@@ -9,11 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface PostRepository extends JpaRepository<BlogPostEntity, Long> {
 
   @Query(
-      "select category.id.name from BlogPostCategoryEntity category "
-          + "where category.blogPost.blog_post_id = :postId order by category.id.name")
-  List<String> findCategoryNamesByPostId(@Param("postId") Long postId);
-
-  @Query(
       "select tag.techTag.name from BlogPostTagEntity tag "
           + "where tag.blogPost.blog_post_id = :postId "
           + "order by coalesce(tag.tag_rank, 2147483647), tag.techTag.name")

@@ -7,7 +7,6 @@ import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostTagEntity;
 import com.mini8.backend.database.company.domain.entity.CompanyEntity;
-import com.mini8.backend.database.repository.BlogPostCategoryRepository;
 import com.mini8.backend.database.repository.BlogPostRepository;
 import com.mini8.backend.database.repository.BlogPostTagRepository;
 import com.mini8.backend.database.repository.CompanyRepository;
@@ -49,7 +48,6 @@ public class CompanyService {
   private final BlogPostRepository blogPostRepository;
   private final BlogPostTagRepository blogPostTagRepository;
   private final CompanyPostQueryRepository companyPostQueryRepository;
-  private final BlogPostCategoryRepository blogPostCategoryRepository;
 
   @Transactional
   public CompanyListResponseDTO getCompanyList(Long userId) {
@@ -57,6 +55,10 @@ public class CompanyService {
         userRepository
             .findById(userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
+
+    if (user.getProfile_version() == 0) {
+      throw new BusinessException(ErrorCode.PROFILE_REQUIRED);
+    }
 
     // 사용자의 관심 기술 ID
     Set<Long> wantSkillIds =

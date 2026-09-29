@@ -1,12 +1,10 @@
 package com.mini8.backend.features.bookmark.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mini8.backend.commons.exception.BusinessException;
 import com.mini8.backend.commons.exception.ErrorCode;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
 import com.mini8.backend.database.bookmark.domain.entity.BookmarkEntity;
-import com.mini8.backend.database.repository.BlogPostCategoryRepository;
 import com.mini8.backend.database.repository.BlogPostRepository;
 import com.mini8.backend.database.repository.UserRepository;
 import com.mini8.backend.features.bookmark.domain.dto.BookmarkResponseDTO;
@@ -20,7 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +28,9 @@ public class BookmarkService {
   private final BookmarkRepository bookmarkRepository;
   private final UserRepository userRepository;
   private final BlogPostRepository blogPostRepository;
-  private final BlogPostCategoryRepository blogPostCategoryRepository;
   // findGuidedPostIds 이 존재하는 래포 가져오기
   private final CompanyPostQueryRepository companyPostQueryRepository;
-    
+
   @Transactional
   public BookmarkResponseDTO addBookmark(Long userId, Long postId) {
 
@@ -85,6 +81,18 @@ public class BookmarkService {
             ? List.of()
             : companyPostQueryRepository.findGuidedPostIds(userId, profileVersion, postIds);
 
+    // 글별 기술 칩. 04 글 목록(CompanyService)과 같은 조회라 순서도 같다
+    Map<Long, List<String>> skillsByPost =
+        postIds.isEmpty()
+            ? Map.of()
+            : companyPostQueryRepository.findTags(postIds).stream()
+                .collect(
+                    Collectors.groupingBy(
+                        tag -> tag.getId().getBlog_post_id(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                            tag -> tag.getTechTag().getName(), Collectors.toList())));
+
     List<BookmarkResponseDTO> bookmarks =
         bookmarkEntities.stream()
             .map(
@@ -93,32 +101,10 @@ public class BookmarkService {
 
                   Long postId = post.getBlog_post_id();
 
-                //   List<String> categories =
-                //       blogPostCategoryRepository.findCategoriesByPostId(postId).stream()
-                //           .map(category -> category.getId().getName())
-                //           .toList();
-
-                List<String> categories =
-                    post.getField() == null || post.getField().isBlank()
-                        ? List.of()
-                        : List.of(post.getField());
-                          
-
-                Map<Long, List<String>> skillsByPostId =
-                    companyPostQueryRepository.findTags(postIds).stream()
-                        .collect(
-                            Collectors.groupingBy(
-                                tag -> tag.getId().getBlog_post_id(),
-                                LinkedHashMap::new,
-                                Collectors.mapping(
-                                    tag -> tag.getTechTag().getName(),
-                                    Collectors.toList()
-                                )
-                            )
-                        );
-
-
-
+                  List<String> categories =
+                      post.getField() == null || post.getField().isBlank()
+                          ? List.of()
+                          : List.of(post.getField());
 
                   OffsetDateTime savedAt =
                       bookmark.getCreated_at().atOffset(ZoneOffset.of("+09:00"));
@@ -131,7 +117,7 @@ public class BookmarkService {
                       .companyName(post.getCompany().getName())
                       .categories(categories)
                       .summary(post.getSummary())
-                      .skills(skillsByPostId.getOrDefault(postId, List.of()))
+                      .skills(skillsByPost.getOrDefault(postId, List.of()))
                       .publishedAt(post.getPublished_at().toLocalDate())
                       .savedAt(savedAt)
                       .hasGuide(guidedPostIds.contains(postId))
