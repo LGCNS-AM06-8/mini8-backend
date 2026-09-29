@@ -1,6 +1,5 @@
 package com.mini8.backend.features.bookmark.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mini8.backend.commons.exception.BusinessException;
 import com.mini8.backend.commons.exception.ErrorCode;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
@@ -20,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +32,7 @@ public class BookmarkService {
   private final BlogPostCategoryRepository blogPostCategoryRepository;
   // findGuidedPostIds 이 존재하는 래포 가져오기
   private final CompanyPostQueryRepository companyPostQueryRepository;
-    
+
   @Transactional
   public BookmarkResponseDTO addBookmark(Long userId, Long postId) {
 
@@ -93,32 +91,24 @@ public class BookmarkService {
 
                   Long postId = post.getBlog_post_id();
 
-                //   List<String> categories =
-                //       blogPostCategoryRepository.findCategoriesByPostId(postId).stream()
-                //           .map(category -> category.getId().getName())
-                //           .toList();
+                  //   List<String> categories =
+                  //       blogPostCategoryRepository.findCategoriesByPostId(postId).stream()
+                  //           .map(category -> category.getId().getName())
+                  //           .toList();
 
-                List<String> categories =
-                    post.getField() == null || post.getField().isBlank()
-                        ? List.of()
-                        : List.of(post.getField());
-                          
+                  List<String> categories =
+                      post.getField() == null || post.getField().isBlank()
+                          ? List.of()
+                          : List.of(post.getField());
 
-                Map<Long, List<String>> skillsByPostId =
-                    companyPostQueryRepository.findTags(postIds).stream()
-                        .collect(
-                            Collectors.groupingBy(
-                                tag -> tag.getId().getBlog_post_id(),
-                                LinkedHashMap::new,
-                                Collectors.mapping(
-                                    tag -> tag.getTechTag().getName(),
-                                    Collectors.toList()
-                                )
-                            )
-                        );
-
-
-
+                  Map<Long, List<String>> skillsByPostId =
+                      companyPostQueryRepository.findTags(postIds).stream()
+                          .collect(
+                              Collectors.groupingBy(
+                                  tag -> tag.getId().getBlog_post_id(),
+                                  LinkedHashMap::new,
+                                  Collectors.mapping(
+                                      tag -> tag.getTechTag().getName(), Collectors.toList())));
 
                   OffsetDateTime savedAt =
                       bookmark.getCreated_at().atOffset(ZoneOffset.of("+09:00"));
