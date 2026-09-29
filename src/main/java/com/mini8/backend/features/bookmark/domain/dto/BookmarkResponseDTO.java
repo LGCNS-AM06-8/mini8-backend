@@ -26,9 +26,13 @@ public class BookmarkResponseDTO {
   private String title;
   private String companyName;
   private List<String> categories;
+  private String summary;
+  private List<String> skills;
   private LocalDate publishedAt;
   private OffsetDateTime savedAt;
+
+
   private Boolean hasGuide;
-  @JsonIgnore
+  
   private LocalDateTime createdAt;
 }
