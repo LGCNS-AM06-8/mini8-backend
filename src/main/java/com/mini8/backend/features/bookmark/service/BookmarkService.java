@@ -5,7 +5,6 @@ import com.mini8.backend.commons.exception.ErrorCode;
 import com.mini8.backend.database.User.domain.entity.UserEntity;
 import com.mini8.backend.database.blog.domain.entity.BlogPostEntity;
 import com.mini8.backend.database.bookmark.domain.entity.BookmarkEntity;
-import com.mini8.backend.database.repository.BlogPostCategoryRepository;
 import com.mini8.backend.database.repository.BlogPostRepository;
 import com.mini8.backend.database.repository.UserRepository;
 import com.mini8.backend.features.bookmark.domain.dto.BookmarkResponseDTO;
@@ -29,7 +28,6 @@ public class BookmarkService {
   private final BookmarkRepository bookmarkRepository;
   private final UserRepository userRepository;
   private final BlogPostRepository blogPostRepository;
-  private final BlogPostCategoryRepository blogPostCategoryRepository;
   // findGuidedPostIds 이 존재하는 래포 가져오기
   private final CompanyPostQueryRepository companyPostQueryRepository;
 
@@ -104,9 +102,9 @@ public class BookmarkService {
                   Long postId = post.getBlog_post_id();
 
                   List<String> categories =
-                      blogPostCategoryRepository.findCategoriesByPostId(postId).stream()
-                          .map(category -> category.getId().getName())
-                          .toList();
+                      post.getField() == null || post.getField().isBlank()
+                          ? List.of()
+                          : List.of(post.getField());
 
                   OffsetDateTime savedAt =
                       bookmark.getCreated_at().atOffset(ZoneOffset.of("+09:00"));
