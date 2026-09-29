@@ -29,8 +29,9 @@ public class CompanyController {
   // getCompanyList: 기업 목록 불러오기
   @Operation(summary = "기업 목록 조회", description = "저장된 기업 조회")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "기업 목록 불러오기 성공"),
-    @ApiResponse(responseCode = "401", description = "기업 목록 불러오기 실패")
+    @ApiResponse(responseCode = "200", description = "기업 목록 조회 성공"),
+    @ApiResponse(responseCode = "401", description = "기업 목록 조회 실패(토큰 유효성 확인)"),
+    @ApiResponse(responseCode = "400", description = "기업 목록 조회 실패(프로필 미생성)")
   })
   @GetMapping
   public ResponseEntity<?> getCompanyList(@AuthenticationPrincipal Long userId) {
