@@ -69,7 +69,7 @@ COLLATE utf8mb4_unicode_ci;
 
 ### 3. 로컬 데이터 넣기
 
-[`mini8-content-dump.sql`](http://test.com)을 다운로드 받아 명령 프롬프트에서 실행합니다.
+[`mini8-content-dump.sql`](https://github.com/LGCNS-AM06-8/mini8-backend/blob/develop/mini8-content-dump.sql)을 다운로드 받아 명령 프롬프트에서 실행합니다.
 
 ```cmd
 mariadb -u root -p mini8 < mini8-content-dump.sql
