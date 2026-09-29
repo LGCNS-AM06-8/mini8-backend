@@ -1,70 +1,226 @@
 # mini8-backend
 
-기술블로그 읽기 가이드 서버입니다. Spring Boot 3.4.5 · Java 17 · MariaDB · JPA · JWT.
-구조는 수업 프로젝트(inspire_jpa)와 같습니다.
+경력, 보유 기술, 관심 기술과 희망 직무를 기반으로 기술 블로그를 추천하고, 선택한 글을 사용자 수준에 맞게 읽을 수 있도록 AI 가이드를 제공하는 ReCu 백엔드 서버입니다.
 
-누가 어디를 고치는지는 `AGENTS.md` 「소유 지도」에 있습니다.
+- 서비스: https://mini8-frontend.vercel.app
+- Swagger: https://backend-production-fe2f.up.railway.app/swagger-ui/index.html
+
+## 프로젝트 정보
+
+| 구분 | 내용 |
+|---|---|
+| 제작 기간 | 2026-09-21 ~ 2026-09-30 |
+| 참여 인원 | 6명(Frontend 2명, Backend 4명) |
+
+## 주요 기능
+
+- Google OAuth 로그인
+- JWT Access Token 발급 및 Refresh Token 재발급·폐기
+- 사용자 프로필 최초 등록·조회·수정
+- 관심 기술 기반 기업 및 기술 블로그 추천
+- 기업 정보와 게시글 원문 조회
+- Gemini 기반 맞춤형 읽기 가이드 생성
+- 게시글 북마크 등록·조회·삭제
+- 기업 기술 블로그 수집 및 관리자용 적재 API
+
+## 기술 스택
+
+| 구분 | 기술 |
+|---|---|
+| Language | Java 17 |
+| Framework | Spring Boot 3.4.5 |
+| Database | MariaDB |
+| ORM | Spring Data JPA · Hibernate |
+| Authentication | Google OAuth 2.0 · JWT |
+| API 문서 | Springdoc OpenAPI · Swagger UI |
+| AI | Google Gemini |
+| 수집 | Jsoup |
+| Test | JUnit 5 · H2 |
+| Deployment | Railway |
+
+## 실행 환경
+
+로컬 실행에는 다음 항목이 필요합니다.
+
+- JDK 17
+- MariaDB 11.x
+- Google OAuth Client ID
+- Gemini API Key
+
+Java 버전은 Gradle toolchain에서 17로 고정되어 있습니다.
 
 ## 시작하기
 
-```
+### 1. 저장소 복제
+
+```powershell
 git clone https://github.com/LGCNS-AM06-8/mini8-backend.git
 cd mini8-backend
 git checkout develop
-
-cp .env.example .env                    # 값 채우기 (DB · JWT_SECRET · GOOGLE_CLIENT_ID · GEMINI_API_KEY)
-git config core.hooksPath .githooks     # 처음 한 번만. 커밋 검사 켜기
-
-.\gradlew bootRun                       # http://localhost:8000/swagger-ui/index.html
-.\gradlew test                          # MariaDB 없이 H2로 기동 확인
 ```
 
-Windows PowerShell 은 `./gradlew` 가 아니라 `.\gradlew` 입니다.
-JDK 는 17 이어야 합니다. `build.gradle` toolchain 이 17 고정이라 21 단독 설치 시 빌드가 실패합니다.
+### 2. 데이터베이스 생성
 
-MariaDB 에 `mini8` 데이터베이스를 만들어 두시면 됩니다.
-`CREATE DATABASE mini8 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
-문자셋을 지정하지 않으면 글 제목의 한글과 이모지가 깨집니다. 표는 서버가 뜰 때 `database/entity` 의 엔티티에서 만들어집니다(`ddl-auto: update`).
+```sql
+CREATE DATABASE mini8
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
 
-## 커밋할 때 자동으로 도는 검사
+### 3. 로컬 데이터 넣기
 
-`git config core.hooksPath .githooks` 를 한 번 쳐 두면 커밋할 때마다 두 가지를 봅니다.
+[`mini8-content-dump.sql`](http://test.com)을 다운로드 받아 명령 프롬프트에서 실행합니다.
 
-| 언제 | 무엇 | 막히면 |
+```cmd
+mariadb -u root -p mini8 < mini8-content-dump.sql
+```
+
+덤프에는 기업 · 게시글 · 구간 · 기술 테이블만 들어 있습니다. 사용자 정보는 없으므로 서버를 실행한 뒤 본인의 Google 계정으로 로그인하면 됩니다.
+
+### 4. 환경변수 설정
+
+```powershell
+Copy-Item .env.example .env
+```
+
+`.env`에 다음 값을 입력합니다.
+
+| 환경변수 | 설명 | 필수 |
 |---|---|---|
-| 커밋 직전 | 코드 모양이 구글 표준과 같은지 | `./gradlew spotlessApply` 로 고치고 다시 커밋 |
-| 메시지 작성 직후 | `feat(auth): 설명` 형식인지 | 형식에 맞게 다시 쓰기 |
+| `DB_URL` | MariaDB JDBC 주소 | O |
+| `DB_USER` | MariaDB 사용자 | O |
+| `DB_PASSWORD` | MariaDB 비밀번호 | O |
+| `JWT_SECRET` | JWT 서명 키 | O |
+| `GOOGLE_CLIENT_ID` | Google OAuth Client ID | O |
+| `GEMINI_API_KEY` | Gemini API Key | O |
+| `COLLECT_DATA_DIR` | 수집 데이터 파일 경로 | 수집 기능 사용 시 |
 
-코드 모양은 손으로 맞추지 않아도 됩니다. `./gradlew spotlessApply` 가 전부 정렬합니다. 프론트의 prettier와 같은 역할입니다.
+`.env`에는 비밀값이 포함되므로 커밋하지 않습니다.
 
-## 폴더 구조
+### 5. 서버 실행
 
+```powershell
+.\gradlew.bat bootRun
 ```
+
+로컬 Swagger:
+
+```text
+http://localhost:8000/swagger-ui/index.html
+```
+
+## 테스트
+
+PR을 올리기 전에 전체 검사를 실행합니다.
+
+```powershell
+.\gradlew.bat check
+```
+
+MariaDB 없이 H2를 사용해 전체 테스트를 실행합니다.
+
+```powershell
+.\gradlew.bat test
+```
+
+외부 기술 블로그에 실제 요청하는 수집 테스트는 별도로 실행합니다.
+
+```powershell
+.\gradlew.bat test -Pnetwork
+```
+
+코드 포맷을 자동으로 적용하려면 다음 명령을 사용합니다.
+
+```powershell
+.\gradlew.bat spotlessApply
+```
+
+## 프로젝트 구조
+
+```text
 com.mini8.backend
-├─ commons/            공통 (박준우)
-│  ├─ config/          SecurityConfig · SwaggerConfig
-│  ├─ filter/          요청 헤더 토큰을 사용자로
-│  ├─ token/           JWT 발급 · 검증
-│  ├─ exception/       ErrorCode · BusinessException
-│  └─ handler/         전역 예외 처리 · 오류 응답
-├─ database/entity/    JPA 엔티티 10개 (노건우). 표의 원천, 한 자리에 한 벌
-└─ features/{도메인}/
-   ├─ ctrl/            컨트롤러 (경로와 상태코드만, 로직 없음)
-   ├─ service/         업무 로직
-   ├─ repository/      JPA (제네릭은 database/entity 의 클래스)
-   └─ domain/dto/      요청 · 응답 DTO
+├─ commons/                       공통 기능
+│  ├─ config/                     Security · CORS · Swagger 설정
+│  ├─ exception/                  오류 코드 · 비즈니스 예외
+│  ├─ filter/                     JWT 인증 필터
+│  ├─ handler/                    공통 오류 응답 처리
+│  └─ token/                      JWT 발급 · 검증
+├─ database/
+│  ├─ User/domain/entity/          사용자 관련 엔티티
+│  ├─ Tech/domain/entity/          기술 태그 엔티티
+│  ├─ company/domain/entity/       기업 엔티티
+│  ├─ blog/domain/entity/          게시글 관련 엔티티
+│  ├─ bookmark/domain/entity/      북마크 엔티티
+│  ├─ ai_guide/domain/entity/      AI 가이드 엔티티
+│  └─ repository/                 공통 JPA Repository
+└─ features/
+   ├─ user/                       로그인 · 프로필
+   ├─ tech/                       기술 칩
+   ├─ company/                    기업 목록 · 상세 · 글 목록
+   ├─ post/                       게시글 상세
+   ├─ guide/                      AI 읽기 가이드
+   ├─ bookmark/                   북마크
+   └─ collect/                    게시글 수집 · 관리자 API
 ```
 
-도메인은 일곱입니다. `user` · `tech` · `company` · `post` · `guide` · `bookmark` · `collect`.
+각 기능은 필요한 범위에서 다음 구조를 사용합니다.
 
-## 규약
+```text
+ctrl/          API 요청·응답 처리
+service/       업무 로직
+repository/    도메인별 데이터 조회
+domain/dto/    요청·응답 DTO
+```
 
-- 정상 응답은 봉투 없이 DTO 그대로 내립니다. 오류만 `{code, message, field}` 입니다
-- 토큰은 응답 헤더 `Authorization: Bearer …` 와 `Refresh-Token` 으로 보냅니다. 프론트는 `Authorization` 헤더로 보냅니다
-- 컨트롤러에서 사용자는 `@AuthenticationPrincipal Long userId` 로 받습니다
-- 표를 바꿀 때는 `database/entity` 의 엔티티를 고칩니다 (DB 담당). SQL 파일은 쓰지 않습니다
-- 이름은 Java camelCase · 클래스 PascalCase · DB snake_case · JSON camelCase · URL 소문자 복수형
+## API 응답
 
-## 아직 없는 것
+정상 응답은 별도의 공통 봉투 없이 DTO를 반환합니다.
 
-작업 목록과 순서는 디스코드 `backend-task` · `db-task` · `crawling-task` 포럼에 있습니다. 설계 근거는 노션 ERD와 API 명세서에 있습니다.
+오류 응답은 다음 형식을 사용합니다.
+
+```json
+{
+  "code": "ERROR_CODE",
+  "message": "오류 메시지",
+  "field": null
+}
+```
+
+인증이 필요한 API는 다음 헤더를 사용합니다.
+
+```http
+Authorization: Bearer <access-token>
+```
+
+로그인 성공 시 `Authorization`과 `Refresh-Token` 응답 헤더로 토큰을 전달합니다.
+
+## 기여 방법
+
+브랜치, 커밋 메시지와 PR 작성 규칙은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따릅니다.
+
+```powershell
+git config core.hooksPath .githooks
+```
+
+이 설정을 적용하면 커밋 전에 Spotless 검사와 커밋 메시지 형식 검사가 자동으로 실행됩니다.
+
+담당 영역과 저장소 작업 규칙은 [AGENTS.md](AGENTS.md)에서 확인할 수 있습니다.
+
+## 만든 사람
+
+| 이름 | 담당 영역 |
+|---|---|
+| 신해원 | 조장 · 블로그 게시물 수집 · AI 분류 · 산출물 총괄 |
+| 노건우 | 기업 상세 · 북마크 · DB 설계 |
+| 박준우 | 프로필 · 기업 추천 · 구글 로그인 및 토큰 |
+| 류지범 | 글 읽기 · 기업별 글 목록 · AI 가이드와 지시문 |
+| 진성민 | /login · /userInput · /home · 기업 리스트 및 상세보기 |
+| 김민서 | 블로그 상세보기 · 북마크 · 전체 화면 디자인 · 공통 시스템 변수 세팅 |
+
+
+## 참고한 내용
+
+- API 규격: [API 명세서](https://app.notion.com/p/3df36a4d171680cca44ae6693674b7be?v=8f336a4d171683c0b85e08892d2cef2d&source=copy_link)
+- ERD: [ERD / 테이블 명세서](https://app.notion.com/p/5-cc636a4d1716822985a6013ee1e50ceb?source=copy_link)
+- 화면 설계: [화면 설계](https://www.figma.com/design/PXMMTbObThkRVGTRwM9Gxh/1%EC%B0%A8-%EB%AF%B8%EB%8B%88%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8?node-id=150-405&t=XAXPg3LckIimpOmP-1)
+- 브랜치 · 커밋 · PR 규칙: [CONTRIBUTING.md](CONTRIBUTING.md)
